@@ -605,17 +605,17 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
 <div class="page" id="page-apihub">
   <div class="section-title"><span class="ico">🔌</span> API Hub — External Tools</div>
   <div class="grid grid-2">
-    <div class="conn-card"><span class="conn-name">Hermes Agent</span><span class="chip chip-muted">not_configured</span><span class="chip chip-purple">optional</span></div>
-    <div class="conn-card"><span class="conn-name">MCP Server</span><span class="chip chip-muted">not_configured</span><span class="chip chip-purple">optional</span></div>
-    <div class="conn-card"><span class="conn-name">OpenClaw</span><span class="chip chip-muted">not_configured</span><span class="chip chip-purple">optional</span></div>
-    <div class="conn-card"><span class="conn-name">Browser Use</span><span class="chip chip-muted">not_configured</span><span class="chip chip-purple">optional</span></div>
-    <div class="conn-card"><span class="conn-name">Firecrawl</span><span class="chip chip-muted">not_configured</span><span class="chip chip-purple">optional</span></div>
-    <div class="conn-card"><span class="conn-name">Ollama</span><span class="chip chip-muted">not_configured</span><span class="chip chip-purple">optional</span></div>
-    <div class="conn-card"><span class="conn-name">OpenWebUI</span><span class="chip chip-muted">not_configured</span><span class="chip chip-purple">optional</span></div>
-    <div class="conn-card"><span class="conn-name">n8n</span><span class="chip chip-muted">not_configured</span><span class="chip chip-purple">optional</span></div>
-    <div class="conn-card"><span class="conn-name">Apple macOS Agent</span><span class="chip chip-muted">planned</span><span class="chip chip-purple">future</span></div>
-    <div class="conn-card"><span class="conn-name">Telegram</span><span class="chip chip-muted">not_configured</span><span class="chip chip-purple">optional</span></div>
-    <div class="conn-card"><span class="conn-name">WhatsApp</span><span class="chip chip-muted">not_configured</span><span class="chip chip-purple">optional</span></div>
+    <div class="conn-card"><span class="conn-name">Hermes Agent</span><span class="chip chip-muted" data-env="HERMES_BASE_URL">not_configured</span><span class="chip chip-purple">optional</span></div>
+    <div class="conn-card"><span class="conn-name">MCP Server</span><span class="chip chip-muted" data-env="MCP_BASE_URL">not_configured</span><span class="chip chip-purple">optional</span></div>
+    <div class="conn-card"><span class="conn-name">OpenClaw</span><span class="chip chip-muted" data-env="OPENCLAW_BASE_URL">not_configured</span><span class="chip chip-purple">optional</span></div>
+    <div class="conn-card"><span class="conn-name">Browser Use</span><span class="chip chip-muted" data-env="BROWSER_USE_BASE_URL">not_configured</span><span class="chip chip-purple">optional</span></div>
+    <div class="conn-card"><span class="conn-name">Firecrawl</span><span class="chip chip-muted" data-env="FIRECRAWL_BASE_URL">not_configured</span><span class="chip chip-purple">optional</span></div>
+    <div class="conn-card"><span class="conn-name">Ollama</span><span class="chip chip-muted" data-env="OLLAMA_BASE_URL">not_configured</span><span class="chip chip-purple">optional</span></div>
+    <div class="conn-card"><span class="conn-name">OpenWebUI</span><span class="chip chip-muted" data-env="OPENWEBUI_BASE_URL">not_configured</span><span class="chip chip-purple">optional</span></div>
+    <div class="conn-card"><span class="conn-name">n8n</span><span class="chip chip-muted" data-env="N8N_BASE_URL">not_configured</span><span class="chip chip-purple">optional</span></div>
+    <div class="conn-card"><span class="conn-name">Apple macOS Agent</span><span class="chip chip-muted" data-env="APPLE_AGENT_API_KEY">planned</span><span class="chip chip-purple">future</span></div>
+    <div class="conn-card"><span class="conn-name">Telegram</span><span class="chip chip-muted" data-env="TELEGRAM_BOT_TOKEN">not_configured</span><span class="chip chip-purple">optional</span></div>
+    <div class="conn-card"><span class="conn-name">WhatsApp</span><span class="chip chip-muted" data-env="WHATSAPP_API_TOKEN">not_configured</span><span class="chip chip-purple">optional</span></div>
   </div>
   <div class="empty-state" style="margin-top:16px">Todas ferramentas externas sao opcionais e requerem configuracao manual. Nenhuma ferramenta e instalada automaticamente. Configure via ZimaOS/Docker.</div>
 </div>
@@ -682,9 +682,9 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
   <div class="section-title"><span class="ico">🧠</span> Bunny Intelligence Bank</div>
   <div class="grid grid-2">
     <div class="card">
-      <h3><span class="ico">🧠</span> Mem0</h3><div class="row"><span>Status</span><span class="chip chip-warning">pending_api</span></div></div>
+      <h3><span class="ico">🧠</span> Mem0</h3><div class="row"><span>Status</span><span class="chip chip-warning" data-env="MEM0_API_KEY">pending_api</span></div></div>
     <div class="card">
-      <h3><span class="ico">📓</span> Obsidian</h3><div class="row"><span>Status</span><span class="chip chip-muted">not_configured</span></div></div>
+      <h3><span class="ico">📓</span> Obsidian</h3><div class="row"><span>Status</span><span class="chip chip-muted" data-env="OBSIDIAN_BASE_URL">not_configured</span></div></div>
     <div class="card">
       <h3><span class="ico">💾</span> Local Memory</h3><div class="row"><span>Status</span><span class="chip chip-success">active</span></div></div>
     <div class="card">
@@ -859,23 +859,64 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
     </div>
 
     <div id="setup-step-3" class="setup-step" style="display:none">
-      <h3>3. Sistemas Externos (Opcional)</h3>
-      <p style="color:var(--text2);font-size:12px;margin-bottom:16px">Insira a URL de outras ferramentas da GrupsBunny.</p>
-      <div class="form-group">
-        <label>Hermes URL</label>
-        <input type="text" id="setup-hermes-url" class="input-theme" placeholder="http://host.docker.internal:8791">
+      <h3>3. Integrações de Inteligência (Memória & Web)</h3>
+      <p style="color:var(--text2);font-size:12px;margin-bottom:16px">Configurações para as ferramentas de cognição e automação.</p>
+      
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="form-group">
+          <label>Mem0 API Key</label>
+          <input type="password" id="setup-mem0-key" class="input-theme" placeholder="m0-...">
+        </div>
+        <div class="form-group">
+          <label>Firecrawl API Key</label>
+          <input type="password" id="setup-firecrawl-key" class="input-theme" placeholder="fc-...">
+        </div>
+        <div class="form-group">
+          <label>Ollama Base URL</label>
+          <input type="text" id="setup-ollama-url" class="input-theme" placeholder="http://host.docker.internal:11434">
+        </div>
+        <div class="form-group">
+          <label>Browser Use URL</label>
+          <input type="text" id="setup-browser-url" class="input-theme" placeholder="http://host.docker.internal:3000">
+        </div>
       </div>
-      <div class="form-group">
-        <label>OpenClaw URL</label>
-        <input type="text" id="setup-openclaw-url" class="input-theme" placeholder="http://host.docker.internal:8000">
-      </div>
-      <div style="display:flex;gap:10px;justify-content:space-between">
+
+      <div style="display:flex;gap:10px;justify-content:space-between;margin-top:16px">
         <button class="voice-btn voice-btn-preview" onclick="nextSetupStep(2)">Voltar</button>
+        <button class="voice-btn voice-btn-start" onclick="nextSetupStep(4)">Proximo Passo: Sistemas</button>
+      </div>
+    </div>
+
+    <div id="setup-step-4" class="setup-step" style="display:none">
+      <h3>4. Sistemas GrupsBunny (ERPs e Sociais)</h3>
+      <p style="color:var(--text2);font-size:12px;margin-bottom:16px">Insira as credenciais dos serviços periféricos e ERP.</p>
+      
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="form-group">
+          <label>Hermes URL</label>
+          <input type="text" id="setup-hermes-url" class="input-theme" placeholder="http://host.docker.internal:8791">
+        </div>
+        <div class="form-group">
+          <label>OpenClaw URL</label>
+          <input type="text" id="setup-openclaw-url" class="input-theme" placeholder="http://host.docker.internal:8000">
+        </div>
+        <div class="form-group">
+          <label>Telegram Bot Token</label>
+          <input type="password" id="setup-telegram-key" class="input-theme" placeholder="1234:ABC...">
+        </div>
+        <div class="form-group">
+          <label>n8n Base URL</label>
+          <input type="text" id="setup-n8n-url" class="input-theme" placeholder="http://host.docker.internal:5678">
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;justify-content:space-between;margin-top:16px">
+        <button class="voice-btn voice-btn-preview" onclick="nextSetupStep(3)">Voltar</button>
         <button class="voice-btn voice-btn-start" onclick="finishSetup()">Finalizar e Conectar</button>
       </div>
     </div>
 
-    <div id="setup-step-4" class="setup-step" style="display:none; text-align:center; padding: 60px 0; background:transparent; border:none;">
+    <div id="setup-step-5" class="setup-step" style="display:none; text-align:center; padding: 60px 0; background:transparent; border:none;">
       <h1 class="setup-conclusion-text">Tokyo OS Conectado.</h1>
       <p style="color:var(--text2); margin-top:20px;">Redirecionando para o sistema de controle principal...</p>
     </div>
@@ -886,16 +927,77 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
 </div>
 
 <script>
-// Navigation
+// Router
+const routeMap = {
+  '/ui': 'page-home',
+  '/ui/voz': 'page-voice',
+  '/ui/comms': 'page-comms',
+  '/ui/grupsbunny': 'page-grupsbunny',
+  '/ui/finance': 'page-finance',
+  '/ui/api-hub': 'page-apihub',
+  '/ui/mcp': 'page-mcp',
+  '/ui/tools': 'page-tools',
+  '/ui/intel': 'page-intel',
+  '/ui/sistema': 'page-system',
+  '/ui/api-keys': 'page-api-keys',
+  '/ui/zimaos': 'page-zimaos',
+  '/ui/deploy': 'page-deploy',
+  '/ui/tools-store': 'page-tools-store',
+  '/ui/setup': 'page-setup'
+};
+
+function activateRoute(path) {
+  const targetPage = routeMap[path.toLowerCase()] || 'page-home';
+  document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  
+  const pageEl = document.getElementById(targetPage);
+  if (pageEl) pageEl.classList.add('active');
+  
+  const btn = document.querySelector(`.sidebar-item[data-page="${targetPage}"]`);
+  if (btn) btn.classList.add('active');
+  
+  if (targetPage === 'page-setup') {
+    loadEnvData();
+  }
+}
+
+window.addEventListener('load', () => {
+  const path = window.location.pathname.replace(/\/$/, "");
+  activateRoute(path === '' ? '/ui' : path);
+  updateModuleStatuses();
+});
+
+window.addEventListener('popstate', () => {
+  activateRoute(window.location.pathname.replace(/\/$/, ""));
+});
+
+// Navigation Click
 document.querySelectorAll('.sidebar-item').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    const target = document.getElementById(btn.dataset.page);
-    if (target) target.classList.add('active');
+    const pageId = btn.dataset.page;
+    const path = Object.keys(routeMap).find(key => routeMap[key] === pageId) || '/ui';
+    history.pushState(null, '', path);
+    activateRoute(path);
   });
 });
+
+// Module Statuses
+async function updateModuleStatuses() {
+  try {
+    const r = await fetch('/tokyo/system/env');
+    const d = await r.json();
+    if (!d.env) return;
+    
+    document.querySelectorAll('[data-env]').forEach(el => {
+      const key = el.getAttribute('data-env');
+      if (d.env[key] === 'configured' || (d.env[key] && d.env[key] !== '')) {
+        el.className = 'chip chip-success';
+        el.textContent = 'Ativo';
+      }
+    });
+  } catch(e) {}
+}
 
 // Mode Switch
 function switchMode(mode) {
@@ -903,16 +1005,11 @@ function switchMode(mode) {
     b.classList.toggle('active', b.textContent.toLowerCase().includes(mode));
   });
   if (mode === 'install') {
-    document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelector('#page-setup')?.classList.add('active');
-    loadEnvData();
+    history.pushState(null, '', '/ui/setup');
+    activateRoute('/ui/setup');
   } else {
-    document.querySelector('#page-setup')?.classList.remove('active');
-    document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
-    document.querySelector('.sidebar-item[data-page="page-home"]')?.classList.add('active');
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelector('#page-home')?.classList.add('active');
+    history.pushState(null, '', '/ui');
+    activateRoute('/ui');
   }
 }
 
@@ -937,8 +1034,15 @@ async function loadEnvData() {
       if (d.env.LIVEKIT_API_KEY) document.getElementById('setup-lk-key').placeholder = "Configurado (digite para alterar)";
       if (d.env.LIVEKIT_API_SECRET) document.getElementById('setup-lk-secret').placeholder = "Configurado (digite para alterar)";
       
+      if (d.env.MEM0_API_KEY) document.getElementById('setup-mem0-key').placeholder = "Configurado (digite para alterar)";
+      if (d.env.FIRECRAWL_BASE_URL) document.getElementById('setup-firecrawl-key').placeholder = "Configurado (digite para alterar)";
+      if (d.env.TELEGRAM_BOT_TOKEN) document.getElementById('setup-telegram-key').placeholder = "Configurado (digite para alterar)";
+      
       if (d.env.HERMES_BASE_URL) document.getElementById('setup-hermes-url').value = d.env.HERMES_BASE_URL;
       if (d.env.OPENCLAW_BASE_URL) document.getElementById('setup-openclaw-url').value = d.env.OPENCLAW_BASE_URL;
+      if (d.env.OLLAMA_BASE_URL) document.getElementById('setup-ollama-url').value = d.env.OLLAMA_BASE_URL;
+      if (d.env.BROWSER_USE_BASE_URL) document.getElementById('setup-browser-url').value = d.env.BROWSER_USE_BASE_URL;
+      if (d.env.N8N_BASE_URL) document.getElementById('setup-n8n-url').value = d.env.N8N_BASE_URL;
     }
   } catch(e) {}
 }
@@ -966,6 +1070,9 @@ async function finishSetup() {
     "LIVEKIT_URL": document.getElementById('setup-lk-url').value,
     "HERMES_BASE_URL": document.getElementById('setup-hermes-url').value,
     "OPENCLAW_BASE_URL": document.getElementById('setup-openclaw-url').value,
+    "OLLAMA_BASE_URL": document.getElementById('setup-ollama-url').value,
+    "BROWSER_USE_BASE_URL": document.getElementById('setup-browser-url').value,
+    "N8N_BASE_URL": document.getElementById('setup-n8n-url').value,
   };
   
   const key = document.getElementById('setup-llm-key').value;
@@ -985,6 +1092,15 @@ async function finishSetup() {
   const lkSec = document.getElementById('setup-lk-secret').value;
   if (lkSec) payload["LIVEKIT_API_SECRET"] = lkSec;
 
+  const mem0 = document.getElementById('setup-mem0-key').value;
+  if (mem0) payload["MEM0_API_KEY"] = mem0;
+  
+  const fc = document.getElementById('setup-firecrawl-key').value;
+  if (fc) payload["FIRECRAWL_API_KEY"] = fc;
+
+  const tg = document.getElementById('setup-telegram-key').value;
+  if (tg) payload["TELEGRAM_BOT_TOKEN"] = tg;
+
   try {
     await fetch('/tokyo/system/env/update', {
       method: 'POST',
@@ -993,7 +1109,7 @@ async function finishSetup() {
     });
   } catch(e) {}
   
-  nextSetupStep(4);
+  nextSetupStep(5);
   setTimeout(() => {
     switchMode('app');
   }, 4000);

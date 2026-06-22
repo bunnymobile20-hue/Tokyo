@@ -94,7 +94,8 @@ def mask_secret(val):
 @app.get("/", response_class=HTMLResponse)
 @app.get("/ui", response_class=HTMLResponse)
 @app.get("/ui/", response_class=HTMLResponse)
-async def serve_ui():
+@app.get("/ui/{module:path}", response_class=HTMLResponse)
+async def serve_ui(module: str = None):
     ui_file = INTERFACE_DIR / "index.html"
     if ui_file.exists():
         return HTMLResponse(content=ui_file.read_text(encoding="utf-8"))
@@ -1262,8 +1263,17 @@ class EnvUpdateRequest(BaseModel):
 @app.get("/tokyo/system/env")
 async def system_env():
     env_file = BASE_DIR / ".env"
-    public_keys = ["GEMINI_MODEL", "OPENAI_MODEL", "TOKYO_DEFAULT_LLM_PROVIDER", "LIVEKIT_URL", "HERMES_BASE_URL", "OPENCLAW_BASE_URL"]
-    secret_keys = ["GEMINI_API_KEY", "OPENAI_API_KEY", "LIVEKIT_API_KEY", "LIVEKIT_API_SECRET"]
+    public_keys = [
+        "GEMINI_MODEL", "OPENAI_MODEL", "TOKYO_DEFAULT_LLM_PROVIDER", 
+        "LIVEKIT_URL", "HERMES_BASE_URL", "OPENCLAW_BASE_URL", "OLLAMA_BASE_URL",
+        "BROWSER_USE_BASE_URL", "FIRECRAWL_BASE_URL", "OBSIDIAN_BASE_URL", "N8N_BASE_URL"
+    ]
+    secret_keys = [
+        "GEMINI_API_KEY", "OPENAI_API_KEY", "LIVEKIT_API_KEY", "LIVEKIT_API_SECRET",
+        "MEM0_API_KEY", "TELEGRAM_BOT_TOKEN", "APPLE_AGENT_API_KEY", "WHATSAPP_API_TOKEN",
+        "SIBERIAN_API_KEY", "BUNNY_SIBERIAN_API_KEY", "GMAIL_API_KEY", "GOOGLE_DRIVE_API_KEY",
+        "ICLOUD_API_KEY", "INSTAGRAM_API_KEY", "TIKTOK_API_KEY", "OPENCODE_API_KEY"
+    ]
     current = {}
     if env_file.exists():
         for line in env_file.read_text().splitlines():
