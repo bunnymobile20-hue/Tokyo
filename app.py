@@ -1258,7 +1258,7 @@ async def serve_setup():
     return HTMLResponse(content="<h1>TokyoOS Setup</h1>", status_code=404)
 
 class EnvUpdateRequest(BaseModel):
-    env_vars: Dict[str, str]
+    env_vars: dict[str, str]
 
 @app.get("/tokyo/system/env")
 async def system_env():
