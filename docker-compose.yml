@@ -71,7 +71,9 @@ services:
       - "x-casaos.store_app_id=tokyoos"
 
 x-casaos:
-  title: TokyoOS
+  title:
+    en_US: TokyoOS
+    pt_BR: TokyoOS
   developer: GrupsBunny
   author: GrupsBunny
   category: Utilities
