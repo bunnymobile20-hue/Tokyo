@@ -88,7 +88,8 @@ fi
 # ============================================================================
 echo -e "${CYAN}→${NC} Starting TokyoOS Services..."
 
-$DOCKER_COMPOSE_CMD up -d --build
+# Workaround for ZimaOS read-only /root/.docker
+HOME=/tmp $DOCKER_COMPOSE_CMD up -d --build
 
 echo ""
 echo -e "${GREEN}✓ Setup complete!${NC}"
