@@ -1,0 +1,81 @@
+version: "3.9"
+
+services:
+  tokyoos:
+    build: .
+    container_name: tokyoos
+    ports:
+      - "8788:8788"
+    volumes:
+      - /DATA/AppData/tokyoos:/data/tokyo
+    environment:
+      - TOKYO_ENV=zimaos
+      - TOKYO_HOST=0.0.0.0
+      - TOKYO_HTTP_PORT=8788
+      - TOKYO_DATA_PATH=/DATA/AppData/tokyoos
+      - TOKYO_DATA_DIR=/data/tokyo
+      - TOKYO_LOG_DIR=/data/tokyo/logs
+      - TOKYO_SAFE_MODE=true
+      - TOKYO_TOKEN_EXPOSED=false
+      - TOKYO_DEFAULT_LLM_PROVIDER=${TOKYO_DEFAULT_LLM_PROVIDER:-gemini}
+      - TOKYO_FALLBACK_LLM_PROVIDER=${TOKYO_FALLBACK_LLM_PROVIDER:-openai}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - GEMINI_MODEL=${GEMINI_MODEL:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - OPENAI_MODEL=${OPENAI_MODEL:-}
+      - LIVEKIT_URL=${LIVEKIT_URL:-}
+      - LIVEKIT_API_KEY=${LIVEKIT_API_KEY:-}
+      - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET:-}
+      - MEM0_API_KEY=${MEM0_API_KEY:-}
+      - MEM0_ENABLED=${MEM0_ENABLED:-false}
+      - LOCAL_MEMORY_ENABLED=${LOCAL_MEMORY_ENABLED:-true}
+      - BUNNY_INTELLIGENCE_ENABLED=${BUNNY_INTELLIGENCE_ENABLED:-true}
+      - SIBERIAN_ENABLED=${SIBERIAN_ENABLED:-false}
+      - SIBERIAN_API_BASE_URL=${SIBERIAN_API_BASE_URL:-}
+      - SIBERIAN_API_KEY=${SIBERIAN_API_KEY:-}
+      - SIBERIAN_API_TOKEN=${SIBERIAN_API_TOKEN:-}
+      - BUNNY_SIBERIAN_ENABLED=${BUNNY_SIBERIAN_ENABLED:-false}
+      - BUNNY_SIBERIAN_API_BASE_URL=${BUNNY_SIBERIAN_API_BASE_URL:-}
+      - BUNNY_SIBERIAN_API_KEY=${BUNNY_SIBERIAN_API_KEY:-}
+      - HERMES_ENABLED=${HERMES_ENABLED:-false}
+      - HERMES_BASE_URL=${HERMES_BASE_URL:-}
+      - MCP_ENABLED=${MCP_ENABLED:-false}
+      - MCP_BASE_URL=${MCP_BASE_URL:-}
+      - OLLAMA_ENABLED=${OLLAMA_ENABLED:-false}
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-}
+      - OPENWEBUI_ENABLED=${OPENWEBUI_ENABLED:-false}
+      - OPENWEBUI_BASE_URL=${OPENWEBUI_BASE_URL:-}
+      - BROWSER_USE_ENABLED=${BROWSER_USE_ENABLED:-false}
+      - FIRECRAWL_ENABLED=${FIRECRAWL_ENABLED:-false}
+      - OPENCLAW_ENABLED=${OPENCLAW_ENABLED:-false}
+      - N8N_ENABLED=${N8N_ENABLED:-false}
+      - APPLE_AGENT_ENABLED=${APPLE_AGENT_ENABLED:-false}
+      - TELEGRAM_ENABLED=${TELEGRAM_ENABLED:-false}
+      - WHATSAPP_ENABLED=${WHATSAPP_ENABLED:-false}
+      - LOG_MASK_SECRETS=${LOG_MASK_SECRETS:-true}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8788/tokyo/system/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    labels:
+      - "x-casaos.title=TokyoOS"
+      - "x-casaos.developer=GrupsBunny"
+      - "x-casaos.author=GrupsBunny"
+      - "x-casaos.category=Utilities"
+      - "x-casaos.port_map=8788"
+      - "x-casaos.scheme=http"
+      - "x-casaos.index=/ui"
+      - "x-casaos.store_app_id=tokyoos"
+
+x-casaos:
+  title: TokyoOS
+  developer: GrupsBunny
+  author: GrupsBunny
+  category: Utilities
+  port_map: "8788"
+  scheme: http
+  index: /ui
+  store_app_id: tokyoos

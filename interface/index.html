@@ -1,0 +1,1431 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TokyoOS — GrupsBunny AI Hub</title>
+<style>
+:root {
+  --bg: #0a0a0f; --bg2: #0f0f18; --card: #141420; --card2: #1a1a2e;
+  --border: #1e1e32; --border2: #2a2a40;
+  --text: #e0e0e0; --text2: #9090a8; --text3: #606080;
+  --red: #dc2626; --yellow: #eab308; --green: #22c55e; --cyan: #06b6d4;
+  --purple: #7c3aed; --purple2: #a78bfa; --orange: #f97316;
+  --accent: var(--red); --accent2: #ef4444;
+  --radius: 10px; --radius2: 6px;
+  --shadow: 0 4px 24px rgba(0,0,0,.4);
+  --font: 'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  --font-mono: 'JetBrains Mono','Fira Code',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background:radial-gradient(ellipse at 20% 20%,rgba(124,58,237,.06) 0%,transparent 60%),radial-gradient(ellipse at 80% 80%,rgba(220,38,38,.04) 0%,transparent 60%);pointer-events:none;z-index:0}
+
+/* Topbar */
+.topbar{position:sticky;top:0;z-index:100;background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;height:48px;gap:12px;backdrop-filter:blur(12px)}
+.topbar-logo{font-weight:800;font-size:17px;letter-spacing:1.5px;background:linear-gradient(135deg,var(--red),var(--purple2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.topbar-ver{font-size:11px;color:var(--text3)}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.topbar-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+
+/* Mode Toggle */
+.mode-toggle{display:flex;gap:2px;background:var(--bg);border-radius:var(--radius2);padding:2px}
+.mode-btn{padding:5px 14px;border-radius:5px;font-size:12px;cursor:pointer;border:none;background:transparent;color:var(--text2);transition:all .2s;font-family:var(--font)}
+.mode-btn.active{background:var(--red);color:#fff}
+.mode-btn:hover:not(.active){color:var(--text)}
+
+/* Dock / Sidebar */
+.layout{display:flex;min-height:calc(100vh - 48px);position:relative;z-index:1}
+.sidebar{width:200px;min-width:200px;background:var(--bg2);border-right:1px solid var(--border);padding:12px 8px;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
+.sidebar-item{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:var(--radius2);font-size:13px;color:var(--text2);cursor:pointer;border:none;background:transparent;text-align:left;font-family:var(--font);transition:all .15s}
+.sidebar-item:hover{background:var(--card);color:var(--text)}
+.sidebar-item.active{background:rgba(220,38,38,.12);color:var(--red);font-weight:600}
+.sidebar-item .ico{font-size:16px;width:20px;text-align:center}
+.sidebar-sep{height:1px;background:var(--border);margin:6px 8px}
+
+/* Main */
+.main{flex:1;overflow-y:auto;padding:24px 32px 80px}
+.page{display:none}
+.page.active{display:block}
+
+/* Section headers */
+.section-title{font-size:16px;font-weight:700;color:var(--text);margin:28px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.section-title .ico{font-size:18px}
+
+/* Grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.grid-2{grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.grid-3{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+
+/* Cards */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;transition:border-color .2s,box-shadow .2s}
+.card:hover{border-color:var(--border2);box-shadow:var(--shadow)}
+.card.wide{grid-column:1/-1}
+.card.accent-red{border-left:3px solid var(--red)}
+.card.accent-purple{border-left:3px solid var(--purple)}
+.card.accent-cyan{border-left:3px solid var(--cyan)}
+.card.accent-yellow{border-left:3px solid var(--yellow)}
+.card.accent-green{border-left:3px solid var(--green)}
+.card h3{font-size:14px;margin-bottom:10px;color:var(--text);display:flex;align-items:center;gap:7px}
+.card h3 .ico{font-size:17px}
+.card .info{font-size:12.5px;color:var(--text2);line-height:1.55}
+.card .row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:12.5px;border-bottom:1px solid rgba(255,255,255,.03)}
+.card .row:last-child{border-bottom:none}
+
+/* Chips */
+.chip{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.3px}
+.chip-success{background:rgba(34,197,94,.15);color:var(--green)}
+.chip-warning{background:rgba(234,179,8,.15);color:var(--yellow)}
+.chip-danger{background:rgba(220,38,38,.15);color:var(--red)}
+.chip-info{background:rgba(6,182,212,.15);color:var(--cyan)}
+.chip-purple{background:rgba(124,58,237,.15);color:var(--purple2)}
+.chip-muted{background:rgba(144,144,168,.1);color:var(--text3)}
+.chip-orange{background:rgba(249,115,22,.15);color:var(--orange)}
+
+/* Empty states */
+.empty-state{padding:24px;text-align:center;color:var(--text3);font-size:13px;border:1px dashed var(--border);border-radius:var(--radius)}
+.empty-state .ico{font-size:28px;margin-bottom:8px;display:block}
+
+/* Wizard Steps */
+.wizard-steps{display:flex;gap:4px;margin-bottom:28px;flex-wrap:wrap}
+.wizard-step{padding:8px 16px;border-radius:8px;font-size:12.5px;background:var(--card);border:1px solid var(--border);color:var(--text2);cursor:pointer;font-family:var(--font)}
+.wizard-step.active{background:var(--red);color:#fff;border-color:var(--red)}
+.wizard-step.done{background:rgba(34,197,94,.08);border-color:var(--green);color:var(--green)}
+
+/* Connector Card */
+.conn-card{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--card2);border-radius:var(--radius2);border:1px solid var(--border);font-size:12.5px;transition:all .15s}
+.conn-card:hover{border-color:var(--border2)}
+.conn-card .conn-name{flex:1;font-weight:600}
+.conn-card .conn-detail{font-size:11px;color:var(--text3);margin-top:2px}
+
+/* Command list */
+/* Voice Control Center */
+.voice-shell{display:flex;justify-content:center;padding:28px 0 16px;position:relative}
+.voice-orb-container{text-align:center}
+.voice-orb{width:120px;height:120px;border-radius:50%;background:radial-gradient(circle at 30% 30%,var(--purple2),var(--purple));position:relative;margin:0 auto 12px;transition:all .6s ease;box-shadow:0 0 60px rgba(124,58,237,.3),0 0 120px rgba(124,58,237,.1)}
+.voice-orb.state-idle{background:radial-gradient(circle at 30% 30%,var(--purple2),var(--purple));box-shadow:0 0 60px rgba(124,58,237,.3)}
+.voice-orb.state-listening{background:radial-gradient(circle at 30% 30%,#f87171,var(--red));box-shadow:0 0 80px rgba(220,38,38,.4),0 0 160px rgba(220,38,38,.15);animation:orbPulse .8s infinite}
+.voice-orb.state-thinking{background:radial-gradient(circle at 30% 30%,#67e8f9,var(--cyan));box-shadow:0 0 60px rgba(6,182,212,.4);animation:orbSpin 2s linear infinite}
+.voice-orb.state-speaking{background:radial-gradient(circle at 30% 30%,#86efac,var(--green));box-shadow:0 0 80px rgba(34,197,94,.4);animation:orbBreathe 1s ease-in-out infinite}
+.voice-orb.state-offline{background:radial-gradient(circle at 30% 30%,#9090a8,#606080);box-shadow:0 0 20px rgba(96,96,128,.2)}
+.voice-orb-inner{position:absolute;inset:12px;border-radius:50%;background:var(--bg);opacity:.7}
+.voice-orb-ring{position:absolute;inset:-8px;border-radius:50%;border:2px solid rgba(124,58,237,.2);animation:ringExpand 3s ease-out infinite}
+.voice-orb-ring2{position:absolute;inset:-16px;border-radius:50%;border:1px solid rgba(124,58,237,.1);animation:ringExpand 3s ease-out .5s infinite}
+.voice-orb-pulse{position:absolute;inset:-3px;border-radius:50%;border:2px solid rgba(124,58,237,.3);animation:ringExpand 2s ease-out .3s infinite}
+@keyframes orbPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+@keyframes orbSpin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+@keyframes orbBreathe{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.1);opacity:.85}}
+@keyframes ringExpand{0%{transform:scale(.8);opacity:.6}100%{transform:scale(1.6);opacity:0}}
+.voice-orb-label{font-size:16px;font-weight:700;color:var(--text);margin-top:4px}
+.voice-orb-sub{font-size:11px;color:var(--text3)}
+/* Wave Bars */
+.voice-wave-bars{display:flex;align-items:flex-end;justify-content:center;gap:4px;height:50px;opacity:.4;transition:opacity .5s}
+.voice-wave-bars.active{opacity:1}
+.voice-wave-bars .bar{width:6px;border-radius:3px;background:var(--purple);animation:barNone 0s}
+.voice-wave-bars.active .bar{animation:barBounce .6s ease-in-out infinite alternate}
+.voice-wave-bars.active .bar:nth-child(2){animation-delay:.05s;background:var(--red)}
+.voice-wave-bars.active .bar:nth-child(3){animation-delay:.1s;background:var(--cyan)}
+.voice-wave-bars.active .bar:nth-child(4){animation-delay:.15s;background:var(--purple2)}
+.voice-wave-bars.active .bar:nth-child(5){animation-delay:.2s;background:var(--yellow)}
+.voice-wave-bars.active .bar:nth-child(6){animation-delay:.25s;background:var(--red)}
+.voice-wave-bars.active .bar:nth-child(7){animation-delay:.3s;background:var(--cyan)}
+.voice-wave-bars.active .bar:nth-child(8){animation-delay:.35s;background:var(--purple)}
+.voice-wave-bars.active .bar:nth-child(9){animation-delay:.4s;background:var(--green)}
+.voice-wave-bars.active .bar:nth-child(10){animation-delay:.45s;background:var(--purple2)}
+@keyframes barBounce{0%{height:6px}100%{height:44px}}
+@keyframes barNone{}
+/* Voice Buttons */
+.voice-btn{padding:8px 16px;border-radius:6px;border:none;font-family:var(--font);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;color:#fff}
+.voice-btn-start{background:var(--green)}
+.voice-btn-stop{background:var(--red)}
+.voice-btn-ptt{background:var(--purple)}
+.voice-btn-preview{background:var(--cyan);color:#000}
+.voice-btn-idle{background:var(--text3)}
+.voice-btn:hover{filter:brightness(1.2);transform:translateY(-1px)}
+/* Voice Command Chips */
+.voice-cmd-chip{padding:4px 10px;border-radius:20px;font-size:11px;border:1px solid var(--border);background:var(--card2);color:var(--text2);cursor:pointer;font-family:var(--font);transition:all .15s}
+.voice-cmd-chip:hover{border-color:var(--purple);color:var(--purple2);background:rgba(124,58,237,.08)}
+/* Safety Banner */
+.voice-safety-banner{display:flex;justify-content:center;gap:24px;margin-top:20px;padding:10px 20px;background:rgba(234,179,8,.06);border:1px solid rgba(234,179,8,.15);border-radius:var(--radius);font-size:11px;color:var(--yellow);flex-wrap:wrap;text-align:center}
+/* Store Dashboards */
+.store-tab{padding:8px 18px;border-radius:8px;font-size:13px;cursor:pointer;background:var(--card);border:1px solid var(--border);color:var(--text2);font-family:var(--font);transition:all .15s}
+.store-tab:hover{color:var(--text);border-color:var(--border2)}
+.store-tab.active{background:var(--red);color:#fff;border-color:var(--red)}
+.store-section.active{display:block!important}
+/* Camera Tile in Voice */
+.camera-tile{position:relative;min-height:120px;background:var(--bg);border-radius:var(--radius);overflow:hidden;display:flex;align-items:center;justify-content:center}
+.camera-tile video{width:100%;height:100%;object-fit:cover}
+.camera-off{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);color:var(--text3);font-size:13px;flex-direction:column;gap:8px}
+.camera-off .ico{font-size:32px}
+
+/* Setup mode */
+#page-setup .welcome{text-align:center;padding:40px 20px}
+#page-setup .welcome h1{font-size:36px;background:linear-gradient(135deg,var(--red),var(--purple2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px}
+#page-setup .welcome p{color:var(--text2);font-size:14px}
+
+/* Media */
+@media(max-width:768px){.sidebar{width:60px;min-width:60px}.sidebar-item span{display:none}.main{padding:16px}.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <span class="topbar-logo">TOKYO OS</span>
+  <span class="topbar-ver">v4.3-phase4e</span>
+  <div class="mode-toggle">
+    <button class="mode-btn active" onclick="switchMode('use')">Use Mode</button>
+    <button class="mode-btn" onclick="switchMode('install')">Install Mode</button>
+  </div>
+  <div class="topbar-right">
+    <span class="chip chip-success" id="health-chip">Online</span>
+    <span class="topbar-dot"></span>
+  </div>
+</header>
+
+<div class="layout">
+<nav class="sidebar" id="sidebar">
+  <button class="sidebar-item active" data-page="page-home"><span class="ico">🏠</span><span>Home</span></button>
+  <button class="sidebar-item" data-page="page-voice"><span class="ico">🎙️</span><span>Voz</span></button>
+  <button class="sidebar-item" data-page="page-comms"><span class="ico">💬</span><span>Comunicacao</span></button>
+  <div class="sidebar-sep"></div>
+  <button class="sidebar-item" data-page="page-grupsbunny"><span class="ico">🏢</span><span>GrupsBunny</span></button>
+  <button class="sidebar-item" data-page="page-finance"><span class="ico">📊</span><span>Financeiro</span></button>
+  <div class="sidebar-sep"></div>
+  <button class="sidebar-item" data-page="page-apihub"><span class="ico">🔌</span><span>API Hub</span></button>
+  <button class="sidebar-item" data-page="page-mcp"><span class="ico">🔧</span><span>MCP</span></button>
+  <button class="sidebar-item" data-page="page-tools"><span class="ico">🧰</span><span>Tools</span></button>
+  <div class="sidebar-sep"></div>
+  <button class="sidebar-item" data-page="page-intel"><span class="ico">🧠</span><span>Inteligencia</span></button>
+  <button class="sidebar-item" data-page="page-system"><span class="ico">⚙️</span><span>Sistema</span></button>
+  <button class="sidebar-item" data-page="page-api-keys"><span class="ico">🔑</span><span>API Keys</span></button>
+  <button class="sidebar-item" data-page="page-zimaos"><span class="ico">🐳</span><span>ZimaOS</span></button>
+  <button class="sidebar-item" data-page="page-deploy"><span class="ico">📦</span><span>Deploy</span></button>
+  <div class="sidebar-sep"></div>
+  <button class="sidebar-item" data-page="page-tools-store"><span class="ico">🏪</span><span>Tools Store</span></button>
+</nav>
+
+<main class="main">
+
+<!-- HOME -->
+<div class="page active" id="page-home">
+  <div class="section-title"><span class="ico">🏠</span> TokyoOS — GrupsBunny AI Hub</div>
+  <div class="grid grid-2">
+    <div class="card accent-red">
+      <h3><span class="ico">🎙️</span> Voz</h3>
+      <div class="row"><span>LiveKit</span><span class="chip chip-success">active</span></div>
+      <div class="row"><span>Gemini Realtime</span><span class="chip chip-success">Charon</span></div>
+      <div class="row"><span>Wake Word</span><span class="chip chip-warning">planned</span></div>
+    </div>
+    <div class="card accent-cyan">
+      <h3><span class="ico">🔌</span> API Hub</h3>
+      <div class="row"><span>Conectores</span><span class="chip chip-info">11</span></div>
+      <div class="row"><span>Ativos</span><span class="chip chip-muted">0</span></div>
+      <div class="row"><span>Escrita externa</span><span class="chip chip-success">bloqueada</span></div>
+    </div>
+    <div class="card accent-purple">
+      <h3><span class="ico">🔧</span> MCP</h3>
+      <div class="row"><span>Servidores</span><span class="chip chip-info">5 planejados</span></div>
+      <div class="row"><span>Modo</span><span class="chip chip-purple">optional</span></div>
+      <div class="row"><span>Required</span><span class="chip chip-success">false</span></div>
+    </div>
+    <div class="card accent-green">
+      <h3><span class="ico">🛡️</span> Seguranca</h3>
+      <div class="row"><span>Safe Mode</span><span class="chip chip-success">active</span></div>
+      <div class="row"><span>Tokens</span><span class="chip chip-success">never exposed</span></div>
+      <div class="row"><span>Escrita</span><span class="chip chip-success">bloqueada</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="ico">🏢</span> GrupsBunny</h3>
+      <div class="row"><span>Bunny Dreams</span><span class="chip chip-warning">pending_api</span></div>
+      <div class="row"><span>Bunny Siberian</span><span class="chip chip-warning">pending_api</span></div>
+      <div class="row"><span>Siberian ERP</span><span class="chip chip-muted">not_configured</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="ico">🐳</span> ZimaOS</h3>
+      <div class="row"><span>Porta</span><span>8788</span></div>
+      <div class="row"><span>Docker Compose</span><span class="chip chip-success">ready</span></div>
+      <div class="row"><span>x-casaos</span><span class="chip chip-success">configurado</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- VOICE -->
+<div class="page" id="page-voice">
+  <div class="section-title"><span class="ico">🎙️</span> Voice Control Center — Tokyo IA</div>
+
+  <!-- Orb + Status -->
+  <div class="voice-shell">
+    <div class="voice-orb-container">
+      <div class="voice-orb" id="voice-orb">
+        <div class="voice-orb-inner"></div>
+        <div class="voice-orb-ring"></div>
+        <div class="voice-orb-ring2"></div>
+        <div class="voice-orb-pulse"></div>
+      </div>
+      <div class="voice-orb-label" id="voice-state-label">Aguardando</div>
+      <div class="voice-orb-sub" id="voice-provider-label">LiveKit · Gemini Realtime · Charon</div>
+    </div>
+  </div>
+
+  <!-- Wave bars -->
+  <div class="voice-wave-bars" id="voice-wave-bars">
+    <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+    <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+  </div>
+
+  <div class="grid grid-2" style="margin-top:20px">
+    <!-- Control Bar -->
+    <div class="card wide" style="grid-column:1/-1">
+      <h3><span class="ico">🎛️</span> Voice Control Bar</h3>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <button class="voice-btn voice-btn-start" id="btn-start-session" onclick="startRealSession()">Iniciar Sessao</button>
+        <button class="voice-btn voice-btn-stop" id="btn-stop-session" onclick="stopRealSession()" disabled>Parar Sessao</button>
+        <button class="voice-btn voice-btn-ptt" id="btn-mic-toggle" onclick="toggleMic()">Ligar Mic</button>
+        <span style="margin-left:auto;font-size:11px" id="session-status-text">Modo seguro ativo. Inicie a sessao.</span>
+        <span class="chip chip-muted" id="session-chip" style="font-size:10px">idle</span>
+      </div>
+    </div>
+
+    <!-- Command Preview -->
+    <div class="card">
+      <h3><span class="ico">⌨️</span> Command Preview</h3>
+      <input id="voice-cmd-input" placeholder="Tokyo, abrir dashboard" style="width:100%;padding:8px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:var(--font-mono);font-size:12px;margin-bottom:8px">
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="voice-btn voice-btn-preview" onclick="testVoiceCmd()">Preview Intent</button>
+      </div>
+      <div id="voice-result" style="margin-top:8px;font-size:12px;color:var(--text2)"></div>
+    </div>
+
+    <!-- Quick Commands -->
+    <div class="card">
+      <h3><span class="ico">⚡</span> Quick Commands</h3>
+      <div style="display:flex;flex-wrap:wrap;gap:4px">
+        <button class="voice-cmd-chip" onclick="quickCmd('Tokyo, abrir dashboard')">Dashboard</button>
+        <button class="voice-cmd-chip" onclick="quickCmd('Tokyo, abrir GrupsBunny')">GrupsBunny</button>
+        <button class="voice-cmd-chip" onclick="quickCmd('Tokyo, abrir Bunny Dreams')">Bunny Dreams</button>
+        <button class="voice-cmd-chip" onclick="quickCmd('Tokyo, abrir financeiro')">Financeiro</button>
+        <button class="voice-cmd-chip" onclick="quickCmd('Tokyo, abrir MCP')">MCP</button>
+        <button class="voice-cmd-chip" onclick="quickCmd('Tokyo, abrir API Hub')">API Hub</button>
+        <button class="voice-cmd-chip" onclick="quickCmd('Tokyo, abrir ZimaOS')">ZimaOS</button>
+        <button class="voice-cmd-chip" onclick="quickCmd('Tokyo, status do sistema')">Status</button>
+      </div>
+    </div>
+
+    <!-- Transcript -->
+    <div class="card">
+      <h3><span class="ico">📝</span> Transcript</h3>
+      <div id="transcript-panel" style="max-height:150px;overflow-y:auto;font-size:12px;color:var(--text2)">
+        <div style="text-align:center;color:var(--text3);padding:20px">Nenhuma conversa ativa. Inicie uma sessao ou teste um comando.</div>
+      </div>
+    </div>
+
+    <!-- Status -->
+    <div class="card">
+      <h3><span class="ico">📊</span> Voice Status</h3>
+      <div class="row"><span>Provider</span><span>LiveKit + Gemini Realtime</span></div>
+      <div class="row"><span>Voice</span><span class="chip chip-success">Charon</span></div>
+      <div class="row"><span>State</span><span id="voice-state-chip" class="chip chip-purple">idle</span></div>
+      <div class="row"><span>LiveKit URL</span><span class="chip chip-warning">pending</span></div>
+      <div class="row"><span>Push-to-Talk</span><span class="chip chip-warning">planned</span></div>
+      <div class="row"><span>Wake Word</span><span class="chip chip-warning">Tokyo (planned)</span></div>
+      <div class="row"><span>Preview Mode</span><span class="chip chip-info">enabled</span></div>
+      <div class="row"><span>Live Execution</span><span class="chip chip-danger">blocked</span></div>
+      <div class="row"><span>Token Exposed</span><span class="chip chip-success">never</span></div>
+    </div>
+
+    <!-- Camera / Vision -->
+    <div class="card">
+      <h3><span class="ico">📷</span> Camera / Vision</h3>
+      <div class="camera-tile" id="camera-tile">
+        <div class="camera-off" id="camera-off">
+          <span class="ico">📷</span>
+          <span>Camera desligada</span>
+          <span style="font-size:10px;color:var(--text3)">Ative manualmente no navegador</span>
+        </div>
+        <video id="camera-preview" autoplay playsinline muted style="display:none"></video>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:8px">
+        <button class="voice-btn voice-btn-start" onclick="toggleCamera()">Ativar Camera</button>
+        <button class="voice-btn voice-btn-stop" onclick="stopCamera()">Desativar</button>
+      </div>
+      <div class="row" style="margin-top:6px"><span>LiveKit Video</span><span class="chip chip-muted">not_configured</span></div>
+      <div class="row"><span>Gemini Vision</span><span class="chip chip-muted">not_configured</span></div>
+      <div class="row"><span>Auto Record</span><span class="chip chip-success">blocked</span></div>
+      <div class="row"><span>Privacy</span><span class="chip chip-success">requires user action</span></div>
+    </div>
+
+    <!-- Agent Worker Status -->
+    <div class="card wide" style="grid-column:1/-1">
+      <h3><span class="ico">🤖</span> Gemini Realtime Agent Worker</h3>
+      <div class="row"><span>Agent Configured</span><span class="chip" id="agent-configured-chip">checking...</span></div>
+      <div class="row"><span>Worker Running</span><span class="chip" id="agent-running-chip">checking...</span></div>
+      <div class="row"><span>Room Joined</span><span class="chip" id="agent-room-chip">checking...</span></div>
+      <div class="row"><span>External Tools</span><span class="chip chip-success">disabled</span></div>
+      <div class="row"><span>Destructive Actions</span><span class="chip chip-success">blocked</span></div>
+      <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+        <button class="voice-btn voice-btn-start" onclick="startAgent()">Iniciar Agente</button>
+        <button class="voice-btn voice-btn-stop" onclick="stopAgent()">Parar Agente</button>
+      </div>
+      <div id="agent-warning" style="font-size:11px;color:var(--yellow);margin-top:6px"></div>
+    </div>
+
+    <!-- E2E Test Panel -->
+    <div class="card wide" style="grid-column:1/-1">
+      <h3><span class="ico">🧪</span> Teste Real de Voz (E2E)</h3>
+      <div style="display:flex;gap:6px;margin-bottom:8px">
+        <button class="voice-btn voice-btn-start" onclick="startE2ETest()">Iniciar Teste</button>
+        <button class="voice-btn voice-btn-stop" onclick="stopE2ETest()">Parar Teste</button>
+        <button class="voice-btn voice-btn-preview" onclick="fetchTroubleshoot()">Diagnostico</button>
+      </div>
+      <div id="ts-result" style="font-size:11px;color:var(--text2)"></div>
+    </div>
+
+    <!-- Bidirectional Checklist -->
+    <div class="card wide" style="grid-column:1/-1">
+      <h3><span class="ico">🔁</span> Bidirectional Audio Checklist</h3>
+      <div class="row" id="check-browser"><span>Browser Conectado</span><span class="chip chip-muted">pending</span></div>
+      <div class="row" id="check-mic"><span>Microfone Publicado</span><span class="chip chip-muted">pending</span></div>
+      <div class="row" id="check-agent-running"><span>Agente Rodando</span><span class="chip chip-muted">pending</span></div>
+      <div class="row" id="check-agent-room"><span>Agente na Sala</span><span class="chip chip-muted">pending</span></div>
+      <div class="row" id="check-gemini"><span>Gemini Realtime Pronto</span><span class="chip chip-muted">pending</span></div>
+      <div class="row" id="check-remote"><span>Audio Remoto Recebido</span><span class="chip chip-muted">pending</span></div>
+      <div class="row" id="check-speaking"><span>Tokyo Falando</span><span class="chip chip-muted">pending</span></div>
+    </div>
+  </div>
+
+  <!-- Safety Banner -->
+  <div class="voice-safety-banner">
+    <span>🛡️ Modo seguro ativo</span>
+    <span>Comandos destrutivos exigem autorizacao</span>
+    <span>Nenhuma automacao real executada nesta fase</span>
+  </div>
+</div>
+
+<!-- COMMUNICATIONS -->
+<div class="page" id="page-comms">
+  <div class="section-title"><span class="ico">💬</span> Comunicacao</div>
+  <div class="grid grid-2">
+    <div class="card">
+      <h3><span class="ico">💬</span> Chat Tokyo</h3>
+      <div class="row"><span>Modo</span><span class="chip chip-warning">planned</span></div>
+      <div class="row"><span>Histórico</span><span class="chip chip-muted">local only</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="ico">📱</span> Mensageiros</h3>
+      <div class="row"><span>Telegram</span><span class="chip chip-muted">not_configured</span></div>
+      <div class="row"><span>WhatsApp</span><span class="chip chip-muted">not_configured</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="ico">📅</span> Calendario</h3>
+      <div class="row"><span>Google Calendar</span><span class="chip chip-muted">not_configured</span></div>
+      <div class="row"><span>Apple Calendar</span><span class="chip chip-muted">planned</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="ico">📧</span> Email & Drive</h3>
+      <div class="row"><span>Gmail</span><span class="chip chip-muted">not_configured</span></div>
+      <div class="row"><span>Google Drive</span><span class="chip chip-muted">not_configured</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- GRUPSBUNNY -->
+<div class="page" id="page-grupsbunny">
+  <div class="section-title"><span class="ico">🏢</span> Dashboard GrupsBunny</div>
+  <div class="grid">
+    <div class="card wide">
+      <h3><span class="ico">🏢</span> GrupsBunny Holding</h3>
+      <div class="row"><span>Status</span><span class="chip chip-warning">pending_api</span></div>
+      <div class="row"><span>Empresas</span><span>Bunny Dreams · Bunny Siberian</span></div>
+      <div class="row"><span>Produto</span><span>Sistema Siberian ERP</span></div>
+    </div>
+  </div>
+
+  <!-- Store Tabs -->
+  <div style="display:flex;gap:4px;margin:16px 0;flex-wrap:wrap">
+    <button class="store-tab active" onclick="switchStoreTab('riverside',this)">📍 Loja Riverside</button>
+    <button class="store-tab" onclick="switchStoreTab('teresina',this)">📍 Loja Teresina</button>
+    <button class="store-tab" onclick="switchStoreTab('bunny-siberian',this)">💻 Bunny Siberian</button>
+    <button class="store-tab" onclick="switchStoreTab('siberian-erp',this)">📦 Siberian ERP</button>
+  </div>
+
+  <!-- RIVERSIDE -->
+  <div class="store-panel active" id="store-riverside">
+    <div class="section-title"><span class="ico">📍</span> Loja Riverside</div>
+    <div class="store-subtabs" style="display:flex;gap:4px;margin-bottom:12px">
+      <button class="voice-cmd-chip" onclick="showStoreSection('riverside-sales')">Vendas</button>
+      <button class="voice-cmd-chip" onclick="showStoreSection('riverside-finance')">Financeiro</button>
+      <button class="voice-cmd-chip" onclick="showStoreSection('riverside-stock')">Estoque</button>
+      <button class="voice-cmd-chip" onclick="showStoreSection('riverside-sellers')">Vendedores</button>
+    </div>
+    <div id="riverside-sales" class="store-section active">
+      <div class="grid grid-3">
+        <div class="card"><h3>Meta Mes</h3><div class="row"><span>Valor</span><span>--</span></div><div class="row"><span>Status</span><span class="chip chip-warning">pending_api</span></div></div>
+        <div class="card"><h3>Meta Dia</h3><div class="row"><span>Valor</span><span>--</span></div><div class="row"><span>Status</span><span class="chip chip-info">calculated_pending</span></div></div>
+        <div class="card"><h3>Meta Dia c/ GAP</h3><div class="row"><span>Valor</span><span>--</span></div><div class="row"><span>Status</span><span class="chip chip-info">calculated_pending</span></div></div>
+        <div class="card"><h3>GAP</h3><div class="row"><span>Meta - Vendido</span><span>--</span></div><div class="row"><span>Status</span><span class="chip chip-warning">pending_api</span></div></div>
+        <div class="card"><h3>Dia Anterior</h3><div class="row"><span>Faturamento</span><span>--</span></div><div class="row"><span>Status</span><span class="chip chip-warning">pending_api</span></div></div>
+        <div class="card"><h3>Tempo Real</h3><div class="row"><span>Faturamento</span><span>--</span></div><div class="row"><span>Status</span><span class="chip chip-warning">pending_api</span></div></div>
+        <div class="card"><h3>Tendencia</h3><div class="row"><span>Projecao</span><span>--</span></div><div class="row"><span>Status</span><span class="chip chip-info">calculated_pending</span></div></div>
+        <div class="card"><h3>Semana vs Semana</h3><div class="row"><span>Crescimento</span><span>--</span></div><div class="row"><span>Status</span><span class="chip chip-warning">pending_api</span></div></div>
+        <div class="card"><h3>Ticket Medio</h3><div class="row"><span>Valor</span><span>--</span></div><div class="row"><span>Status</span><span class="chip chip-warning">pending_api</span></div></div>
+      </div>
+    </div>
+    <div id="riverside-finance" class="store-section" style="display:none">
+      <div class="grid grid-2">
+        <div class="card"><h3>DRE</h3><div class="row"><span>Receita</span><span>--</span></div><div class="row"><span>Custos</span><span>--</span></div><div class="row"><span>Lucro</span><span>--</span></div><div class="row"><span>Status</span><span class="chip chip-warning">pending_api</span></div></div>
+        <div class="card"><h3>Fluxo de Caixa</h3><div class="row"><span>Entradas</span><span>--</span></div><div class="row"><span>Saidas</span><span>--</span></div><div class="row"><span>Saldo</span><span>--</span></div><div class="row"><span>Status</span><span class="chip chip-warning">pending_api</span></div></div>
+        <div class="card"><h3>Lucro Operacional</h3><div class="row"><span>Valor</span><span>--</span></div><div class="row"><span>Margem</span><span>--</span></div><div class="row"><span>Status</span><span class="chip chip-warning">pending_api</span></div></div>
+        <div class="card"><h3>Ponto de Equilibrio</h3><div class="row"><span>PE Revenue</span><span>--</span></div><div class="row"><span>Status</span><span class="chip chip-info">planned</span></div></div>
+      </div>
+    </div>
+    <div id="riverside-stock" class="store-section" style="display:none">
+      <div class="grid grid-2">
+        <div class="card"><h3>Parado &gt;30 dias</h3><div class="row"><span>Qtd</span><span>--</span></div><div class="row"><span>Status</span><span class="chip chip-warning">pending_api</span></div></div>
+        <div class="card"><h3>Mais Vendidos</h3><div class="row"><span>Top 5</span><span>--</span></div><div class="row"><span>Status</span><span class="chip chip-warning">pending_api</span></div></div>
+        <div class="card"><h3>Zerados</h3><div class="row"><span>SKUs</span><span>--</span></div><div class="row"><span>Status</span><span class="chip chip-warning">pending_api</span></div></div>
+        <div class="card"><h3>Criticos</h3><div class="row"><span>SKUs</span><span>--</span></div><div class="row"><span>Status</span><span class="chip chip-warning">pending_api</span></div></div>
+        <div class="card"><h3>Perdas/Avarias</h3><div class="row"><span>Valor</span><span>--</span></div><div class="row"><span>Status</span><span class="chip chip-info">planned</span></div></div>
+      </div>
+    </div>
+    <div id="riverside-sellers" class="store-section" style="display:none">
+      <div class="grid grid-2">
+        <div class="card"><h3>Ranking Vendedores</h3><div style="text-align:center;color:var(--text3);padding:20px">Aguardando dados de API</div></div>
+        <div class="card"><h3>Ticket Medio</h3><div class="row"><span>Por vendedor</span><span>--</span></div><div class="row"><span>Status</span><span class="chip chip-warning">pending_api</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TERESINA -->
+  <div class="store-panel" id="store-teresina" style="display:none">
+    <div class="section-title"><span class="ico">📍</span> Loja Teresina</div>
+    <div class="store-subtabs" style="display:flex;gap:4px;margin-bottom:12px">
+      <button class="voice-cmd-chip" onclick="showStoreSection('teresina-sales')">Vendas</button>
+      <button class="voice-cmd-chip" onclick="showStoreSection('teresina-finance')">Financeiro</button>
+      <button class="voice-cmd-chip" onclick="showStoreSection('teresina-stock')">Estoque</button>
+      <button class="voice-cmd-chip" onclick="showStoreSection('teresina-sellers')">Vendedores</button>
+    </div>
+    <div id="teresina-sales" class="store-section active">
+      <div class="grid grid-3">
+        <div class="card"><h3>Meta Mes</h3><div class="row"><span>Valor</span><span>--</span></div><div class="row"><span>Status</span><span class="chip chip-warning">pending_api</span></div></div>
+        <div class="card"><h3>Meta Dia</h3><div class="row"><span>Valor</span><span>--</span></div><div class="row"><span>Status</span><span class="chip chip-info">calculated_pending</span></div></div>
+        <div class="card"><h3>GAP</h3><div class="row"><span>Meta - Vendido</span><span>--</span></div><div class="row"><span>Status</span><span class="chip chip-warning">pending_api</span></div></div>
+        <div class="card"><h3>Dia Anterior</h3><div class="row"><span>Faturamento</span><span>--</span></div><div class="row"><span>Status</span><span class="chip chip-warning">pending_api</span></div></div>
+        <div class="card"><h3>Tendencia</h3><div class="row"><span>Projecao</span><span>--</span></div><div class="row"><span>Status</span><span class="chip chip-info">calculated_pending</span></div></div>
+        <div class="card"><h3>Ticket Medio</h3><div class="row"><span>Valor</span><span>--</span></div><div class="row"><span>Status</span><span class="chip chip-warning">pending_api</span></div></div>
+      </div>
+    </div>
+    <div id="teresina-finance" class="store-section" style="display:none">
+      <div class="grid grid-2">
+        <div class="card"><h3>DRE</h3><div class="row"><span>Receita</span><span>--</span></div><div class="row"><span>Custos</span><span>--</span></div><div class="row"><span>Lucro</span><span>--</span></div><div class="row"><span>Status</span><span class="chip chip-warning">pending_api</span></div></div>
+        <div class="card"><h3>Fluxo de Caixa</h3><div class="row"><span>Entradas</span><span>--</span></div><div class="row"><span>Saidas</span><span>--</span></div><div class="row"><span>Saldo</span><span>--</span></div><div class="row"><span>Status</span><span class="chip chip-warning">pending_api</span></div></div>
+        <div class="card"><h3>Lucro</h3><div class="row"><span>Valor</span><span>--</span></div><div class="row"><span>Margem</span><span>--</span></div><div class="row"><span>Status</span><span class="chip chip-warning">pending_api</span></div></div>
+        <div class="card"><h3>Ponto de Equilibrio</h3><div class="row"><span>PE Revenue</span><span>--</span></div><div class="row"><span>Status</span><span class="chip chip-info">planned</span></div></div>
+      </div>
+    </div>
+    <div id="teresina-stock" class="store-section" style="display:none">
+      <div class="grid grid-2">
+        <div class="card"><h3>Parado &gt;30 dias</h3><div class="row"><span>Qtd</span><span>--</span></div><div class="row"><span>Status</span><span class="chip chip-warning">pending_api</span></div></div>
+        <div class="card"><h3>Mais Vendidos</h3><div class="row"><span>Top 5</span><span>--</span></div><div class="row"><span>Status</span><span class="chip chip-warning">pending_api</span></div></div>
+        <div class="card"><h3>Zerados</h3><div class="row"><span>SKUs</span><span>--</span></div><div class="row"><span>Status</span><span class="chip chip-warning">pending_api</span></div></div>
+        <div class="card"><h3>Criticos</h3><div class="row"><span>SKUs</span><span>--</span></div><div class="row"><span>Status</span><span class="chip chip-warning">pending_api</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BUNNY SIBERIAN -->
+  <div class="store-panel" id="store-bunny-siberian" style="display:none">
+    <div class="section-title"><span class="ico">💻</span> Bunny Siberian — B2B</div>
+    <div class="grid grid-2">
+      <div class="card accent-purple"><h3>Empresa de Sistemas</h3><div class="row"><span>Modelo</span><span>Receita Recorrente</span></div><div class="row"><span>MRR</span><span>--</span></div><div class="row"><span>Clientes</span><span>--</span></div><div class="row"><span>Churn</span><span>--</span></div><div class="row"><span>Status</span><span class="chip chip-warning">pending_api</span></div></div>
+      <div class="card"><h3>Suporte</h3><div class="row"><span>Tickets</span><span>--</span></div><div class="row"><span>Status</span><span class="chip chip-muted">planned</span></div></div>
+      <div class="card"><h3>Implantação</h3><div class="row"><span>Projetos</span><span>--</span></div><div class="row"><span>Status</span><span class="chip chip-muted">planned</span></div></div>
+      <div class="card"><h3>Funil Comercial</h3><div class="row"><span>Leads</span><span>--</span></div><div class="row"><span>Status</span><span class="chip chip-muted">planned</span></div></div>
+    </div>
+  </div>
+
+  <!-- SIBERIAN ERP -->
+  <div class="store-panel" id="store-siberian-erp" style="display:none">
+    <div class="section-title"><span class="ico">📦</span> Sistema Siberian ERP</div>
+    <div class="grid grid-2">
+      <div class="card accent-cyan"><h3>Connector Status</h3><div class="row"><span>Configurado</span><span class="chip chip-muted">false</span></div><div class="row"><span>Mode</span><span class="chip chip-info">read_only</span></div><div class="row"><span>Safe Mode</span><span class="chip chip-success">true</span></div><div class="row"><span>Required</span><span class="chip chip-success">false</span></div><div class="row"><span>API URL</span><span class="chip chip-muted">nao configurada</span></div><div class="row"><span>Auth</span><span class="chip chip-muted">nao configurada</span></div></div>
+      <div class="card"><h3>Modulos</h3><div style="font-size:11px;color:var(--text2);line-height:2">Companies · Stores · Sales · Products · Stock · Finance · Clients · Users · Reports · Recurring · Support</div></div>
+    </div>
+    <div class="empty-state" style="margin-top:12px;font-size:11px">Sistema Siberian nao configurado. Modo seguro ativo. TokyoOS pronta para conexao read-only.</div>
+  </div>
+</div>
+
+<!-- FINANCE -->
+<div class="page" id="page-finance">
+  <div class="section-title"><span class="ico">📊</span> Financeiro GrupsBunny</div>
+  <div class="grid grid-3">
+    <div class="card accent-yellow">
+      <h3><span class="ico">📊</span> DRE</h3>
+      <div class="row"><span>Receita Bruta</span><span>--</span></div>
+      <div class="row"><span>Margem Bruta</span><span>--</span></div>
+      <div class="row"><span>Resultado</span><span>--</span></div>
+      <div class="row"><span>Status</span><span class="chip chip-warning">pending_api</span></div>
+    </div>
+    <div class="card accent-yellow">
+      <h3><span class="ico">💰</span> Fluxo de Caixa</h3>
+      <div class="row"><span>Saldo Inicial</span><span>--</span></div>
+      <div class="row"><span>Entradas</span><span>--</span></div>
+      <div class="row"><span>Saidas</span><span>--</span></div>
+      <div class="row"><span>Status</span><span class="chip chip-warning">pending_api</span></div>
+    </div>
+    <div class="card accent-yellow">
+      <h3><span class="ico">⚖️</span> Ponto de Equilibrio</h3>
+      <div class="row"><span>Custos Fixos</span><span>--</span></div>
+      <div class="row"><span>PE por Loja</span><span>--</span></div>
+      <div class="row"><span>Status</span><span class="chip chip-warning">pending_api</span></div>
+    </div>
+    <div class="card accent-yellow">
+      <h3><span class="ico">🔄</span> Ciclo Financeiro</h3>
+      <div class="row"><span>PM Estoque</span><span>--</span></div>
+      <div class="row"><span>Ciclo Operacional</span><span>--</span></div>
+      <div class="row"><span>Status</span><span class="chip chip-warning">pending</span></div>
+    </div>
+    <div class="card accent-yellow">
+      <h3><span class="ico">🏦</span> Caixa Minimo</h3>
+      <div class="row"><span>Despesa Diaria</span><span>--</span></div>
+      <div class="row"><span>Caixa Minimo</span><span>--</span></div>
+      <div class="row"><span>Status</span><span class="chip chip-warning">pending</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="ico">📤</span> Upload Planilhas</h3>
+      <div class="row"><span>Ativo</span><span class="chip chip-muted">false</span></div>
+      <div class="row"><span>Formatos</span><span>.xlsx .csv</span></div>
+      <div class="row"><span>Blocked</span><span>.xlsm .exe</span></div>
+    </div>
+  </div>
+  <div class="empty-state" style="margin-top:16px">Dados financeiros ainda nao conectados. Configure Sistema Siberian API ou importe planilhas autorizadas. Nenhum valor e exibido como real.</div>
+</div>
+
+<!-- API HUB -->
+<div class="page" id="page-apihub">
+  <div class="section-title"><span class="ico">🔌</span> API Hub — External Tools</div>
+  <div class="grid grid-2">
+    <div class="conn-card"><span class="conn-name">Hermes Agent</span><span class="chip chip-muted">not_configured</span><span class="chip chip-purple">optional</span></div>
+    <div class="conn-card"><span class="conn-name">MCP Server</span><span class="chip chip-muted">not_configured</span><span class="chip chip-purple">optional</span></div>
+    <div class="conn-card"><span class="conn-name">OpenClaw</span><span class="chip chip-muted">not_configured</span><span class="chip chip-purple">optional</span></div>
+    <div class="conn-card"><span class="conn-name">Browser Use</span><span class="chip chip-muted">not_configured</span><span class="chip chip-purple">optional</span></div>
+    <div class="conn-card"><span class="conn-name">Firecrawl</span><span class="chip chip-muted">not_configured</span><span class="chip chip-purple">optional</span></div>
+    <div class="conn-card"><span class="conn-name">Ollama</span><span class="chip chip-muted">not_configured</span><span class="chip chip-purple">optional</span></div>
+    <div class="conn-card"><span class="conn-name">OpenWebUI</span><span class="chip chip-muted">not_configured</span><span class="chip chip-purple">optional</span></div>
+    <div class="conn-card"><span class="conn-name">n8n</span><span class="chip chip-muted">not_configured</span><span class="chip chip-purple">optional</span></div>
+    <div class="conn-card"><span class="conn-name">Apple macOS Agent</span><span class="chip chip-muted">planned</span><span class="chip chip-purple">future</span></div>
+    <div class="conn-card"><span class="conn-name">Telegram</span><span class="chip chip-muted">not_configured</span><span class="chip chip-purple">optional</span></div>
+    <div class="conn-card"><span class="conn-name">WhatsApp</span><span class="chip chip-muted">not_configured</span><span class="chip chip-purple">optional</span></div>
+  </div>
+  <div class="empty-state" style="margin-top:16px">Todas ferramentas externas sao opcionais e requerem configuracao manual. Nenhuma ferramenta e instalada automaticamente. Configure via ZimaOS/Docker.</div>
+</div>
+
+<!-- MCP PANEL -->
+<div class="page" id="page-mcp">
+  <div class="section-title"><span class="ico">🔧</span> MCP Panel — Model Context Protocol</div>
+  <div class="grid">
+    <div class="card wide accent-purple">
+      <h3><span class="ico">🔧</span> MCP Status</h3>
+      <div class="row"><span>Enabled</span><span class="chip chip-muted">false</span></div>
+      <div class="row"><span>Required</span><span class="chip chip-success">false</span></div>
+      <div class="row"><span>Mode</span><span class="chip chip-purple">optional</span></div>
+      <div class="row"><span>Safe Mode</span><span class="chip chip-success">true</span></div>
+      <div class="row"><span>Status</span><span class="chip chip-muted">not_configured</span></div>
+      <div class="row"><span>Port</span><span>8789</span></div>
+    </div>
+    <div class="conn-card"><span class="conn-name">Filesystem MCP</span><span class="chip chip-muted">not_configured</span></div>
+    <div class="conn-card"><span class="conn-name">Memory MCP</span><span class="chip chip-muted">not_configured</span></div>
+    <div class="conn-card"><span class="conn-name">Browser MCP</span><span class="chip chip-muted">not_configured</span></div>
+    <div class="conn-card"><span class="conn-name">Database MCP</span><span class="chip chip-muted">not_configured</span></div>
+    <div class="conn-card"><span class="conn-name">Sistema Siberian MCP</span><span class="chip chip-muted">planned</span></div>
+  </div>
+  <div class="empty-state" style="margin-top:16px">MCP e opcional. Configure servidores via .env. Nenhum servidor ativo atualmente.</div>
+</div>
+
+<!-- TOOLS -->
+<div class="page" id="page-tools">
+  <div class="section-title"><span class="ico">🧰</span> Tools Store — External Connectors</div>
+  <div class="grid grid-3">
+    <div class="card">
+      <h3><span class="ico">🤖</span> Hermes</h3><div class="row"><span>Porta</span><span>8791</span></div><div class="row"><span>Status</span><span class="chip chip-muted">not_configured</span></div><div class="row"><span>Install</span><span class="chip chip-info">docker</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="ico">🔧</span> MCP</h3><div class="row"><span>Porta</span><span>8789</span></div><div class="row"><span>Status</span><span class="chip chip-muted">not_configured</span></div><div class="row"><span>Install</span><span class="chip chip-info">docker</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="ico">🦙</span> Ollama</h3><div class="row"><span>Porta</span><span>11434</span></div><div class="row"><span>Status</span><span class="chip chip-muted">not_configured</span></div><div class="row"><span>Install</span><span class="chip chip-info">docker</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="ico">🌐</span> OpenWebUI</h3><div class="row"><span>Porta</span><span>3000</span></div><div class="row"><span>Status</span><span class="chip chip-muted">not_configured</span></div><div class="row"><span>Install</span><span class="chip chip-info">docker</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="ico">🌐</span> Browser Use</h3><div class="row"><span>Status</span><span class="chip chip-muted">not_configured</span></div><div class="row"><span>Install</span><span class="chip chip-info">docker</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="ico">🔥</span> Firecrawl</h3><div class="row"><span>Status</span><span class="chip chip-muted">not_configured</span></div><div class="row"><span>Install</span><span class="chip chip-info">API key</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="ico">⚡</span> n8n</h3><div class="row"><span>Porta</span><span>5678</span></div><div class="row"><span>Status</span><span class="chip chip-muted">not_configured</span></div><div class="row"><span>Install</span><span class="chip chip-info">docker</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="ico">🍎</span> Apple Agent</h3><div class="row"><span>Status</span><span class="chip chip-muted">planned</span></div><div class="row"><span>Install</span><span class="chip chip-info">Mac only</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="ico">📱</span> Telegram</h3><div class="row"><span>Status</span><span class="chip chip-muted">not_configured</span></div><div class="row"><span>Install</span><span class="chip chip-info">bot token</span></div>
+    </div>
+  </div>
+  <div class="empty-state" style="margin-top:16px">Nenhuma ferramenta instalada automaticamente. Todas requerem configuracao manual de .env e Docker.</div>
+</div>
+
+<!-- INTEL -->
+<div class="page" id="page-intel">
+  <div class="section-title"><span class="ico">🧠</span> Bunny Intelligence Bank</div>
+  <div class="grid grid-2">
+    <div class="card">
+      <h3><span class="ico">🧠</span> Mem0</h3><div class="row"><span>Status</span><span class="chip chip-warning">pending_api</span></div></div>
+    <div class="card">
+      <h3><span class="ico">📓</span> Obsidian</h3><div class="row"><span>Status</span><span class="chip chip-muted">not_configured</span></div></div>
+    <div class="card">
+      <h3><span class="ico">💾</span> Local Memory</h3><div class="row"><span>Status</span><span class="chip chip-success">active</span></div></div>
+    <div class="card">
+      <h3><span class="ico">📁</span> Documentos</h3><div class="row"><span>Status</span><span class="chip chip-muted">planned</span></div></div>
+    <div class="card">
+      <h3><span class="ico">📊</span> Planilhas Financeiras</h3><div class="row"><span>Reconhecidas</span><span class="chip chip-info">6</span></div></div>
+  </div>
+</div>
+
+<!-- SYSTEM -->
+<div class="page" id="page-system">
+  <div class="section-title"><span class="ico">⚙️</span> Sistema</div>
+  <div class="grid grid-2">
+    <div class="card"><h3><span class="ico">🔄</span> Setup</h3><div class="row"><span>Wizard</span><span class="chip chip-success">available</span></div><div class="row"><span>Mode</span><span class="chip chip-info">/setup</span></div></div>
+    <div class="card"><h3><span class="ico">🏥</span> Tokyo Doctor</h3><div class="row"><span>Status</span><span class="chip chip-success">active</span></div><div class="row"><span>Endpoint</span><span>/tokyo/doctor</span></div></div>
+    <div class="card"><h3><span class="ico">🛡️</span> Seguranca</h3><div class="row"><span>Safe Mode</span><span class="chip chip-success">active</span></div><div class="row"><span>Tokens</span><span class="chip chip-success">never exposed</span></div></div>
+    <div class="card"><h3><span class="ico">📋</span> Logs</h3><div class="row"><span>Audit</span><span class="chip chip-info">JSONL active</span></div><div class="row"><span>Secrets</span><span class="chip chip-success">masked</span></div></div>
+    <div class="card"><h3><span class="ico">🔄</span> Update</h3><div class="row"><span>Version</span><span>3.1-phase3b</span></div><div class="row"><span>Status</span><span class="chip chip-info">dual-interface</span></div></div>
+    <div class="card"><h3><span class="ico">🖥️</span> Hardware</h3><div class="row"><span>Target</span><span>Xeon, 2xRTX3060, 64GB</span></div></div>
+  </div>
+</div>
+
+<!-- ZIMAOS -->
+<div class="page" id="page-zimaos">
+  <div class="section-title"><span class="ico">🐳</span> ZimaOS Ready Center</div>
+  <div class="grid">
+    <div class="card wide accent-green">
+      <h3><span class="ico">🐳</span> ZimaOS Deployment</h3>
+      <div class="row"><span>App Port</span><span>8788</span></div>
+      <div class="row"><span>Data Path</span><span>/DATA/AppData/tokyoos</span></div>
+      <div class="row"><span>Volume</span><span>/DATA/AppData/tokyoos:/data/tokyo</span></div>
+      <div class="row"><span>Network</span><span class="chip chip-success">bridge</span></div>
+      <div class="row"><span>Restart</span><span>unless-stopped</span></div>
+      <div class="row"><span>x-casaos</span><span class="chip chip-success">configured</span></div>
+      <div class="row"><span>Healthcheck</span><span class="chip chip-success">active</span></div>
+      <div class="row"><span>Store ID</span><span>tokyoos</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="ico">📁</span> Future Directories</h3>
+      <div style="font-size:12px;color:var(--text2)">
+        /data/tokyo/tools<br>/data/tokyo/connectors<br>/data/tokyo/mcp<br>/data/tokyo/logs<br>/data/tokyo/uploads<br>/data/tokyo/cache<br>/data/tokyo/config
+      </div>
+      <div class="row" style="margin-top:8px"><span>Status</span><span class="chip chip-info">planned</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="ico">🔧</span> External Tools Plan</h3>
+      <div style="font-size:11px;color:var(--text2)">
+        Hermes · MCP · Ollama · OpenWebUI<br>
+        Browser Use · Firecrawl · n8n<br>
+        OpenClaw · Apple Agent
+      </div>
+      <div class="row" style="margin-top:8px"><span>Auto Install</span><span class="chip chip-success">none</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- DEPLOY -->
+<div class="page" id="page-deploy">
+  <div class="section-title"><span class="ico">📦</span> Deploy Status</div>
+  <div class="grid">
+    <div class="card wide accent-green">
+      <h3><span class="ico">🚀</span> Deploy Readiness</h3>
+      <div class="row"><span>Dockerfile</span><span class="chip chip-success">exists</span></div>
+      <div class="row"><span>docker-compose.yml</span><span class="chip chip-success">exists</span></div>
+      <div class="row"><span>x-casaos labels</span><span class="chip chip-success">configured</span></div>
+      <div class="row"><span>Healthcheck</span><span class="chip chip-success">active</span></div>
+      <div class="row"><span>Port</span><span>8788:8788</span></div>
+      <div class="row"><span>Volume</span><span>/DATA/AppData/tokyoos</span></div>
+      <div class="row"><span>Network</span><span class="chip chip-success">bridge (safe)</span></div>
+      <div class="row"><span>Restart</span><span>unless-stopped</span></div>
+      <div class="row"><span>Store ID</span><span>tokyoos</span></div>
+    </div>
+    <div class="card">
+      <h3><span class="ico">🛡️</span> Security Rules</h3>
+      <div class="row"><span>network_mode host</span><span class="chip chip-success">blocked</span></div>
+      <div class="row"><span>privileged mode</span><span class="chip chip-success">blocked</span></div>
+      <div class="row"><span>docker.sock</span><span class="chip chip-success">blocked</span></div>
+      <div class="row"><span>Auto-install</span><span class="chip chip-success">blocked</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- TOOLS STORE -->
+<div class="page" id="page-tools-store">
+  <div class="section-title"><span class="ico">🏪</span> Tools Store — Install Center</div>
+  <div class="grid grid-3">
+    <div class="card"><h3>Hermes</h3><div class="row"><span>Port</span><span>8791</span></div><div class="row"><span>Required</span><span class="chip chip-success">false</span></div><div class="row"><span>Auto</span><span class="chip chip-success">blocked</span></div></div>
+    <div class="card"><h3>MCP</h3><div class="row"><span>Port</span><span>8789</span></div><div class="row"><span>Required</span><span class="chip chip-success">false</span></div><div class="row"><span>Auto</span><span class="chip chip-success">blocked</span></div></div>
+    <div class="card"><h3>Ollama</h3><div class="row"><span>Port</span><span>11434</span></div><div class="row"><span>Auto</span><span class="chip chip-success">blocked</span></div></div>
+    <div class="card"><h3>OpenWebUI</h3><div class="row"><span>Port</span><span>3000</span></div><div class="row"><span>Auto</span><span class="chip chip-success">blocked</span></div></div>
+    <div class="card"><h3>Browser Use</h3><div class="row"><span>Auto</span><span class="chip chip-success">blocked</span></div></div>
+    <div class="card"><h3>Firecrawl</h3><div class="row"><span>Auto</span><span class="chip chip-success">blocked</span></div></div>
+    <div class="card"><h3>n8n</h3><div class="row"><span>Port</span><span>5678</span></div><div class="row"><span>Auto</span><span class="chip chip-success">blocked</span></div></div>
+    <div class="card"><h3>OpenClaw</h3><div class="row"><span>Auto</span><span class="chip chip-success">blocked</span></div></div>
+    <div class="card"><h3>Apple Agent</h3><div class="row"><span>Auto</span><span class="chip chip-success">blocked</span></div></div>
+    <div class="card"><h3>Telegram</h3><div class="row"><span>Auto</span><span class="chip chip-success">blocked</span></div></div>
+    <div class="card"><h3>WhatsApp</h3><div class="row"><span>Auto</span><span class="chip chip-success">blocked</span></div></div>
+  </div>
+  <div class="empty-state" style="margin-top:16px">Instalacao automatica BLOQUEADA. Todas ferramentas requerem configuracao manual.</div>
+</div>
+
+<!-- API KEY CENTER -->
+<div class="page" id="page-api-keys">
+  <div class="section-title"><span class="ico">🔑</span> Tokyo API Key Center</div>
+  <div class="grid">
+    <div class="card wide">
+      <h3><span class="ico">🔐</span> Internal API Keys</h3>
+      <div class="row"><span>Total</span><span id="ak-total">...</span></div>
+      <div class="row"><span>Active</span><span id="ak-active">...</span></div>
+      <div style="display:flex;gap:6px;margin-top:8px">
+        <button class="voice-btn voice-btn-start" onclick="createAPIKey()">Nova Chave</button>
+        <button class="voice-btn voice-btn-preview" onclick="refreshAPIKeys()">Atualizar</button>
+      </div>
+      <div id="ak-create-result" style="font-size:12px;color:var(--green);margin-top:8px"></div>
+    </div>
+    <div class="card wide" style="grid-column:1/-1">
+      <h3><span class="ico">📋</span> Chaves Internas</h3>
+      <div id="ak-list" style="font-size:12px;color:var(--text2)">Carregando...</div>
+    </div>
+  </div>
+  <div class="empty-state" style="margin-top:16px;text-align:left">
+    <b>Atenção:</b> Estas chaves são geradas pelo TokyoOS para que sistemas externos (como Hermes e OpenClaw) possam se conectar e enviar informações para o cérebro da GrupsBunny.<br>
+    Tokens externos (LiveKit/Gemini/OpenAI) não são configurados aqui, use o <b>Setup Wizard</b> (botão Install) para inseri-los no arquivo de ambiente do sistema.
+  </div>
+</div>
+
+<!-- SETUP WIZARD -->
+<div class="page" id="page-setup">
+  <div id="setup-wizard-container" style="padding-top: 40px;">
+    <div id="setup-step-1" class="setup-step active">
+      <h3>1. Motor Cognitivo (LLM)</h3>
+      <p style="color:var(--text2);font-size:12px;margin-bottom:16px">Defina qual Inteligencia Artificial sera o cerebro da Tokyo.</p>
+      <div class="form-group">
+        <label>Provedor Principal</label>
+        <select id="setup-llm-provider" class="input-theme" onchange="toggleSetupLLM()">
+          <option value="gemini">Google Gemini (Recomendado)</option>
+          <option value="openai">OpenAI (ChatGPT)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Chave de API (API Key)</label>
+        <input type="password" id="setup-llm-key" class="input-theme" placeholder="AIzaSy... ou sk-proj-...">
+      </div>
+      <div class="form-group">
+        <label>Modelo Especifico</label>
+        <input type="text" id="setup-llm-model" class="input-theme" value="gemini-1.5-flash">
+      </div>
+      <div style="text-align:right">
+        <button class="voice-btn voice-btn-start" onclick="nextSetupStep(2)">Proximo Passo: Voz</button>
+      </div>
+    </div>
+
+    <div id="setup-step-2" class="setup-step" style="display:none">
+      <h3>2. Motor de Voz (LiveKit)</h3>
+      <p style="color:var(--text2);font-size:12px;margin-bottom:16px">Configure o servidor WebRTC para comunicacao em tempo real e baixa latencia.</p>
+      <div class="form-group">
+        <label>LiveKit URL (wss://)</label>
+        <input type="text" id="setup-lk-url" class="input-theme" placeholder="wss://tokyo-app-xyz.livekit.cloud">
+      </div>
+      <div class="form-group">
+        <label>LiveKit API Key</label>
+        <input type="password" id="setup-lk-key" class="input-theme" placeholder="API...">
+      </div>
+      <div class="form-group">
+        <label>LiveKit API Secret</label>
+        <input type="password" id="setup-lk-secret" class="input-theme" placeholder="...">
+      </div>
+      <div style="display:flex;gap:10px;justify-content:space-between">
+        <button class="voice-btn voice-btn-preview" onclick="nextSetupStep(1)">Voltar</button>
+        <button class="voice-btn voice-btn-start" onclick="nextSetupStep(3)">Proximo Passo: Integracoes</button>
+      </div>
+    </div>
+
+    <div id="setup-step-3" class="setup-step" style="display:none">
+      <h3>3. Sistemas Externos (Opcional)</h3>
+      <p style="color:var(--text2);font-size:12px;margin-bottom:16px">Insira a URL de outras ferramentas da GrupsBunny.</p>
+      <div class="form-group">
+        <label>Hermes URL</label>
+        <input type="text" id="setup-hermes-url" class="input-theme" placeholder="http://host.docker.internal:8791">
+      </div>
+      <div class="form-group">
+        <label>OpenClaw URL</label>
+        <input type="text" id="setup-openclaw-url" class="input-theme" placeholder="http://host.docker.internal:8000">
+      </div>
+      <div style="display:flex;gap:10px;justify-content:space-between">
+        <button class="voice-btn voice-btn-preview" onclick="nextSetupStep(2)">Voltar</button>
+        <button class="voice-btn voice-btn-start" onclick="finishSetup()">Finalizar e Conectar</button>
+      </div>
+    </div>
+
+    <div id="setup-step-4" class="setup-step" style="display:none; text-align:center; padding: 60px 0; background:transparent; border:none;">
+      <h1 class="setup-conclusion-text">Tokyo OS Conectado.</h1>
+      <p style="color:var(--text2); margin-top:20px;">Redirecionando para o sistema de controle principal...</p>
+    </div>
+  </div>
+</div>
+
+</main>
+</div>
+
+<script>
+// Navigation
+document.querySelectorAll('.sidebar-item').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const target = document.getElementById(btn.dataset.page);
+    if (target) target.classList.add('active');
+  });
+});
+
+// Mode Switch
+function switchMode(mode) {
+  document.querySelectorAll('.mode-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent.toLowerCase().includes(mode));
+  });
+  if (mode === 'install') {
+    document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelector('#page-setup')?.classList.add('active');
+    loadEnvData();
+  } else {
+    document.querySelector('#page-setup')?.classList.remove('active');
+    document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
+    document.querySelector('.sidebar-item[data-page="page-home"]')?.classList.add('active');
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelector('#page-home')?.classList.add('active');
+  }
+}
+
+// Setup Wizard Logic
+async function loadEnvData() {
+  try {
+    const r = await fetch('/tokyo/system/env');
+    const d = await r.json();
+    if (d.env) {
+      if (d.env.TOKYO_DEFAULT_LLM_PROVIDER) {
+        document.getElementById('setup-llm-provider').value = d.env.TOKYO_DEFAULT_LLM_PROVIDER;
+        toggleSetupLLM(true);
+      }
+      if (d.env.GEMINI_MODEL) document.getElementById('setup-llm-model').value = d.env.GEMINI_MODEL;
+      if (d.env.GEMINI_API_KEY) document.getElementById('setup-llm-key').placeholder = "Configurado (digite para alterar)";
+      if (d.env.OPENAI_API_KEY && d.env.TOKYO_DEFAULT_LLM_PROVIDER === 'openai') {
+        document.getElementById('setup-llm-key').placeholder = "Configurado (digite para alterar)";
+        if (d.env.OPENAI_MODEL) document.getElementById('setup-llm-model').value = d.env.OPENAI_MODEL;
+      }
+      
+      if (d.env.LIVEKIT_URL) document.getElementById('setup-lk-url').value = d.env.LIVEKIT_URL;
+      if (d.env.LIVEKIT_API_KEY) document.getElementById('setup-lk-key').placeholder = "Configurado (digite para alterar)";
+      if (d.env.LIVEKIT_API_SECRET) document.getElementById('setup-lk-secret').placeholder = "Configurado (digite para alterar)";
+      
+      if (d.env.HERMES_BASE_URL) document.getElementById('setup-hermes-url').value = d.env.HERMES_BASE_URL;
+      if (d.env.OPENCLAW_BASE_URL) document.getElementById('setup-openclaw-url').value = d.env.OPENCLAW_BASE_URL;
+    }
+  } catch(e) {}
+}
+
+function toggleSetupLLM(skipModel = false) {
+  const p = document.getElementById('setup-llm-provider').value;
+  if (!skipModel) {
+    if (p === 'gemini') {
+      document.getElementById('setup-llm-model').value = 'gemini-1.5-flash';
+    } else {
+      document.getElementById('setup-llm-model').value = 'gpt-4o';
+    }
+  }
+}
+
+function nextSetupStep(step) {
+  document.querySelectorAll('.setup-step').forEach(el => el.style.display = 'none');
+  document.getElementById('setup-step-' + step).style.display = 'block';
+}
+
+async function finishSetup() {
+  const p = document.getElementById('setup-llm-provider').value;
+  const payload = {
+    "TOKYO_DEFAULT_LLM_PROVIDER": p,
+    "LIVEKIT_URL": document.getElementById('setup-lk-url').value,
+    "HERMES_BASE_URL": document.getElementById('setup-hermes-url').value,
+    "OPENCLAW_BASE_URL": document.getElementById('setup-openclaw-url').value,
+  };
+  
+  const key = document.getElementById('setup-llm-key').value;
+  if (key) {
+    if (p === 'gemini') payload["GEMINI_API_KEY"] = key;
+    else payload["OPENAI_API_KEY"] = key;
+  }
+  const mod = document.getElementById('setup-llm-model').value;
+  if (mod) {
+    if (p === 'gemini') payload["GEMINI_MODEL"] = mod;
+    else payload["OPENAI_MODEL"] = mod;
+  }
+  
+  const lkKey = document.getElementById('setup-lk-key').value;
+  if (lkKey) payload["LIVEKIT_API_KEY"] = lkKey;
+  
+  const lkSec = document.getElementById('setup-lk-secret').value;
+  if (lkSec) payload["LIVEKIT_API_SECRET"] = lkSec;
+
+  try {
+    await fetch('/tokyo/system/env/update', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({env_vars: payload})
+    });
+  } catch(e) {}
+  
+  nextSetupStep(4);
+  setTimeout(() => {
+    switchMode('app');
+  }, 4000);
+}
+
+
+// Voice Command Test
+// Voice State Simulation
+function voiceSimState(state) {
+  const orb = document.getElementById('voice-orb');
+  const label = document.getElementById('voice-state-label');
+  const chip = document.getElementById('voice-state-chip');
+  const bars = document.getElementById('voice-wave-bars');
+  const panel = document.getElementById('transcript-panel');
+  orb.className = 'voice-orb state-' + state;
+  const states = {idle:'Aguardando',listening:'Ouvindo...',thinking:'Processando...',speaking:'Falando...',offline:'Offline',error:'Erro'};
+  const colors = {idle:'chip-purple',listening:'chip-danger',thinking:'chip-info',speaking:'chip-success',offline:'chip-muted',error:'chip-warning'};
+  label.textContent = states[state] || state;
+  chip.textContent = state;
+  chip.className = 'chip ' + (colors[state] || 'chip-muted');
+  if (state === 'listening' || state === 'thinking') {
+    bars.classList.add('active');
+  } else {
+    bars.classList.remove('active');
+  }
+  if (state === 'speaking') {
+    const now = new Date().toLocaleTimeString();
+    panel.innerHTML = '<div style="padding:6px 0;border-bottom:1px solid var(--border)"><span style="color:var(--cyan)">User:</span> "Status do sistema"</div><div style="padding:6px 0"><span style="color:var(--green)">Tokyo:</span> Sistema operacional. LiveKit conectado. Todos os modulos online.</div><div style="font-size:10px;color:var(--text3);margin-top:4px">'+now+' · preview_only</div>';
+  } else if (state === 'listening') {
+    panel.innerHTML = '<div style="padding:6px 0"><span style="color:var(--red)">Ouvindo...</span> Aguardando comando de voz.</div>';
+  }
+}
+
+async function testVoiceCmd() {
+  const cmd = document.getElementById('voice-cmd-input').value || 'Tokyo, abrir dashboard';
+  const result = document.getElementById('voice-result');
+  voiceSimState('thinking');
+  try {
+    const resp = await fetch('/tokyo/voice/activation/preview', {
+      method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({command:cmd})
+    });
+    const data = await resp.json();
+    result.innerHTML = data.recognized
+      ? '<div style="color:var(--green);font-weight:600">✓ Reconhecido</div>Intent: ' + data.target + '<br><span style="color:var(--text3)">' + data.message + '</span>'
+      : '<div style="color:var(--yellow);font-weight:600">✗ Nao reconhecido</div>' + data.message;
+    voiceSimState(data.recognized ? 'speaking' : 'idle');
+  } catch(e) {
+    result.innerHTML = '<span style="color:var(--red)">Erro ao testar comando</span>';
+    voiceSimState('error');
+  }
+}
+
+function quickCmd(cmd) {
+  document.getElementById('voice-cmd-input').value = cmd;
+  testVoiceCmd();
+}
+
+// Store tab switching
+function switchStoreTab(storeId, btn) {
+  document.querySelectorAll('.store-panel').forEach(p => p.style.display = 'none');
+  document.querySelectorAll('.store-tab').forEach(t => t.classList.remove('active'));
+  const panel = document.getElementById('store-' + storeId);
+  if (panel) { panel.style.display = 'block'; }
+  if (btn) { btn.classList.add('active'); }
+}
+
+function showStoreSection(sectionId) {
+  const panel = document.getElementById(sectionId);
+  if (!panel) return;
+  const parent = panel.parentElement;
+  parent.querySelectorAll('.store-section').forEach(s => s.style.display = 'none');
+  panel.style.display = 'block';
+}
+
+// Camera
+let cameraStream = null;
+async function toggleCamera() {
+  const video = document.getElementById('camera-preview');
+  const off = document.getElementById('camera-off');
+  if (cameraStream) { stopCamera(); return; }
+  try {
+    cameraStream = await navigator.mediaDevices.getUserMedia({video: true, audio: false});
+    video.srcObject = cameraStream;
+    video.style.display = 'block';
+    off.style.display = 'none';
+  } catch(e) {
+    off.innerHTML = '<span class="ico">📷</span><span>Camera indisponivel</span><span style="font-size:10px;color:var(--text3)">Permita o acesso ou use HTTPS</span>';
+  }
+}
+function stopCamera() {
+  if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); cameraStream = null; }
+  const video = document.getElementById('camera-preview');
+  const off = document.getElementById('camera-off');
+  video.style.display = 'none';
+  video.srcObject = null;
+  off.style.display = 'flex';
+ }
+
+// Health check pulse + Agent status
+setInterval(async () => {
+  try {
+    const r = await fetch('/tokyo/system/health');
+    const d = await r.json();
+    document.getElementById('health-chip').textContent = d.health === 'ok' ? 'Online' : 'Degraded';
+    document.getElementById('health-chip').className = 'chip ' + (d.health === 'ok' ? 'chip-success' : 'chip-warning');
+  } catch(e) {
+    document.getElementById('health-chip').textContent = 'Offline';
+    document.getElementById('health-chip').className = 'chip chip-danger';
+  }
+  // Agent status
+  try {
+    const ar = await fetch('/tokyo/voice/agent/status');
+    const ad = await ar.json();
+    const a = ad.agent || {};
+    const c = (v, t, f) => v ? ['chip-success', t] : ['chip-muted', f];
+    const [cc, ct] = c(a.configured, 'configured', 'not_configured');
+    document.getElementById('agent-configured-chip').textContent = ct;
+    document.getElementById('agent-configured-chip').className = 'chip ' + cc;
+    const [rc, rt] = c(a.worker_running, 'running', 'not_started');
+    document.getElementById('agent-running-chip').textContent = rt;
+    document.getElementById('agent-running-chip').className = 'chip ' + rc;
+    const [jc, jt] = c(a.room_joined, 'joined', 'not_joined');
+    document.getElementById('agent-room-chip').textContent = jt;
+    document.getElementById('agent-room-chip').className = 'chip ' + jc;
+    if (!a.worker_running && a.configured) {
+      document.getElementById('agent-warning').textContent = 'Agente nao iniciado. Use o botao Iniciar Agente ou execute manualmente.';
+    } else if (!a.configured) {
+      document.getElementById('agent-warning').textContent = 'Agente nao configurado. Configure LiveKit e Gemini Realtime no .env.';
+    } else {
+      document.getElementById('agent-warning').textContent = '';
+    }
+    // Bidirectional checklist
+    const check = (id, ok) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const span = el.querySelector('span:last-child');
+      if (span) { span.textContent = ok ? 'ok' : 'pending'; span.className = 'chip ' + (ok ? 'chip-success' : 'chip-muted'); }
+    };
+    const bd = await (await fetch('/tokyo/voice/bidirectional/status')).json();
+    const b = bd.bidirectional || {};
+    check('check-browser', b.browser_client_ready);
+    check('check-mic', b.microphone_published);
+    check('check-agent-running', b.agent_worker_running);
+    check('check-agent-room', b.agent_joined_room);
+    check('check-gemini', b.gemini_realtime_ready);
+    check('check-remote', b.remote_audio_received);
+    check('check-speaking', b.tokyo_can_speak);
+  } catch(e) {}
+}, 15000);
+
+async function startAgent() {
+  const room = liveSessionRoom || sessionData?.room || prompt('Room name:');
+  if (!room) { alert('Crie uma sessao primeiro (Iniciar Sessao)'); return; }
+  if (!confirm('Confirmar inicio do agente Tokyo?\nRoom: ' + room + '\nConfirm code: START_TOKYO_AGENT')) return;
+  try {
+    const r = await fetch('/tokyo/voice/agent/start', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({room:room, confirm:'START_TOKYO_AGENT'})
+    });
+    const d = await r.json();
+    document.getElementById('agent-warning').textContent = d.message || (d.started ? 'Agente iniciado!' : 'Falha: ' + (d.error || ''));
+  } catch(e) { document.getElementById('agent-warning').textContent = 'Erro ao iniciar agente'; }
+}
+
+async function stopAgent() {
+  const room = liveSessionRoom || prompt('Room name:');
+  if (!room) return;
+  if (!confirm('Confirmar parada do agente Tokyo?\nRoom: ' + room + '\nConfirm code: STOP_TOKYO_AGENT')) return;
+  try {
+    const r = await fetch('/tokyo/voice/agent/stop', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({room:room, confirm:'STOP_TOKYO_AGENT'})
+    });
+    const d = await r.json();
+    document.getElementById('agent-warning').textContent = d.message || 'Agente parado.';
+  } catch(e) { document.getElementById('agent-warning').textContent = 'Erro ao parar agente'; }
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/livekit-client@2/dist/livekit-client.umd.min.js"></script>
+<script>
+// ── LiveKit Real Session ──────────────────────────────────
+let lkRoom = null;
+let localAudioTrack = null;
+let localMicTrack = null;
+let remoteAudioElements = {};
+
+const SESSION_STATES = {
+  IDLE: 'idle',
+  CONNECTING: 'connecting',
+  CONNECTED: 'connected',
+  LISTENING: 'listening',
+  SPEAKING: 'speaking',
+  MUTED: 'muted',
+  ERROR: 'error',
+  OFFLINE: 'offline'
+};
+
+function updateSessionUI(state, detail) {
+  const chip = document.getElementById('session-chip');
+  const status = document.getElementById('session-status-text');
+  const orb = document.getElementById('voice-orb');
+  const label = document.getElementById('voice-state-label');
+  const states = {
+    idle: {cls:'chip-muted',txt:'idle',orb:'state-idle',label:'Aguardando'},
+    connecting: {cls:'chip-warning',txt:'connecting',orb:'state-thinking',label:'Conectando...'},
+    connected: {cls:'chip-success',txt:'connected',orb:'state-idle',label:'Conectado'},
+    listening: {cls:'chip-danger',txt:'listening',orb:'state-listening',label:'Ouvindo...'},
+    speaking: {cls:'chip-success',txt:'speaking',orb:'state-speaking',label:'Falando...'},
+    muted: {cls:'chip-purple',txt:'muted',orb:'state-idle',label:'Mudo'},
+    error: {cls:'chip-danger',txt:'error',orb:'state-offline',label:'Erro'},
+    offline: {cls:'chip-muted',txt:'offline',orb:'state-offline',label:'Offline'},
+  };
+  const s = states[state] || states.idle;
+  chip.textContent = s.txt; chip.className = 'chip ' + s.cls;
+  orb.className = 'voice-orb ' + s.orb;
+  label.textContent = s.label;
+  if (status) status.textContent = detail || '';
+  document.getElementById('voice-state-chip').textContent = state;
+  document.getElementById('voice-state-chip').className = 'chip ' + s.cls;
+}
+
+async function startRealSession() {
+  const panel = document.getElementById('transcript-panel');
+  updateSessionUI('connecting', 'Conectando ao LiveKit...');
+  document.getElementById('btn-start-session').disabled = true;
+
+  let sessionData;
+  try {
+    const resp = await fetch('/tokyo/voice/session/create', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({identity:'tokyo-user'})
+    });
+    sessionData = await resp.json();
+  } catch(e) {
+    updateSessionUI('error', 'Erro ao criar sessao no backend');
+    panel.innerHTML = '<div style="color:var(--red)">Falha ao chamar /tokyo/voice/session/create</div>';
+    document.getElementById('btn-start-session').disabled = false;
+    return;
+  }
+
+  if (sessionData.status !== 'session_ready') {
+    updateSessionUI('offline', sessionData.next_step || 'LiveKit nao configurado');
+    panel.innerHTML = '<div style="color:var(--yellow)">' + (sessionData.next_step || 'LiveKit nao configurado. Configure .env') + '</div>';
+    document.getElementById('btn-start-session').disabled = false;
+    return;
+  }
+
+  // Connect to LiveKit Room
+  try {
+    const LiveKitClient = window.LivekitClient;
+    if (!LiveKitClient) {
+      updateSessionUI('error', 'LiveKit SDK nao carregado');
+      panel.innerHTML = '<div style="color:var(--yellow)">LiveKit client SDK nao disponivel. Recarregue a pagina.</div>';
+      document.getElementById('btn-start-session').disabled = false;
+      return;
+    }
+
+    const url = 'wss://' + sessionData.ws_url;
+    lkRoom = new LiveKitClient.Room({ adaptiveStream: true, dynacast: true });
+
+    lkRoom.on(LiveKitClient.RoomEvent.Connected, () => {
+      updateSessionUI('connected', 'Sala: ' + sessionData.room.substring(0,16));
+      panel.innerHTML = '<div style="color:var(--green)">Sessao LiveKit conectada. Microfone aguardando ativacao.</div>';
+      document.getElementById('btn-start-session').disabled = true;
+      document.getElementById('btn-stop-session').disabled = false;
+      markE2EEvent('browser_connected', sessionData.room);
+    });
+
+    lkRoom.on(LiveKitClient.RoomEvent.Disconnected, () => {
+      updateSessionUI('idle', 'Sessao encerrada');
+      panel.innerHTML = '<div style="color:var(--text2)">Sessao LiveKit desconectada.</div>';
+      document.getElementById('btn-start-session').disabled = false;
+      document.getElementById('btn-stop-session').disabled = true;
+      cleanupLocalTracks();
+    });
+
+    lkRoom.on(LiveKitClient.RoomEvent.TrackSubscribed, (track, pub, participant) => {
+      if (track.kind === 'audio' && !participant.isLocal) {
+        const el = track.attach();
+        markE2EEvent('remote_audio_received', sessionData?.room || '');
+        el.play().then(() => {
+          markE2EEvent('audio_playback_started', sessionData?.room || '');
+        }).catch(() => {
+          panel.innerHTML += '<div style="color:var(--yellow);font-size:11px">Audio bloqueado pelo navegador. Clique na pagina para liberar.</div>';
+        });
+        remoteAudioElements[track.sid] = el;
+        updateSessionUI('speaking', participant.identity + ' falando');
+      }
+    });
+
+    lkRoom.on(LiveKitClient.RoomEvent.LocalTrackPublished, (pub, track) => {
+      if (track.kind === 'audio') {
+        updateSessionUI('listening', 'Microfone ativo');
+        markE2EEvent('mic_published', sessionData?.room || '');
+      }
+    });
+
+    await lkRoom.connect(url, sessionData.access_token);
+    panel.innerHTML = '<div style="color:var(--green)">Conectado a sala <b>' + sessionData.room.substring(0,12) + '</b>.<br>Ative o microfone.</div>';
+
+  } catch(e) {
+    updateSessionUI('error', 'Erro de conexao: ' + (e.message || 'desconhecido'));
+    panel.innerHTML = '<div style="color:var(--red)">Falha ao conectar ao LiveKit.<br><small>' + (e.message || 'Verifique rede e token') + '</small></div>';
+    document.getElementById('btn-start-session').disabled = false;
+  }
+}
+
+async function toggleMic() {
+  if (localMicTrack) {
+    // Mute/unmute
+    const muted = !localMicTrack.isMuted;
+    localMicTrack.mute(muted);
+    updateSessionUI(muted ? 'muted' : 'listening', muted ? 'Microfone mutado' : 'Microfone ativo');
+    return;
+  }
+  if (!lkRoom || lkRoom.state !== 'connected') {
+    document.getElementById('transcript-panel').innerHTML = '<div style="color:var(--yellow)">Inicie uma sessao primeiro.</div>';
+    return;
+  }
+  try {
+    const LiveKitClient = window.LivekitClient;
+    localAudioTrack = await LiveKitClient.createLocalAudioTrack({
+      echoCancellation: true,
+      noiseSuppression: true,
+    });
+    localMicTrack = localAudioTrack.mediaStreamTrack;
+    await lkRoom.localParticipant.publishTrack(localAudioTrack);
+    updateSessionUI('listening', 'Microfone ativo. Tokyo ouvindo.');
+  } catch(e) {
+    if (e.name === 'NotAllowedError' || e.name === 'PermissionDeniedError') {
+      updateSessionUI('error', 'Permissao de microfone negada');
+    } else {
+      updateSessionUI('error', 'Erro no microfone: ' + (e.message || ''));
+    }
+  }
+}
+
+function cleanupLocalTracks() {
+  if (localAudioTrack) { localAudioTrack.stop(); localAudioTrack = null; }
+  if (localMicTrack) { localMicTrack.stop(); localMicTrack = null; }
+  Object.values(remoteAudioElements).forEach(el => { el.remove(); });
+  remoteAudioElements = {};
+}
+
+async function stopRealSession() {
+  updateSessionUI('connecting', 'Encerrando sessao...');
+  cleanupLocalTracks();
+  if (lkRoom) {
+    try { await lkRoom.disconnect(); } catch(e) {}
+    lkRoom = null;
+  }
+  try {
+    await fetch('/tokyo/voice/session/stop', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({room:'', identity:'tokyo-user'})
+    });
+  } catch(e) {}
+  updateSessionUI('idle', 'Sessao encerrada. Recursos liberados.');
+  document.getElementById('btn-start-session').disabled = false;
+  document.getElementById('btn-stop-session').disabled = true;
+  document.getElementById('transcript-panel').innerHTML = '<div style="text-align:center;color:var(--text3);padding:20px">Sessao encerrada. Inicie novamente para conversar.</div>';
+}
+
+// E2E markers
+async function markE2EEvent(event, room) {
+  try {
+    await fetch('/tokyo/voice/e2e/mark-event', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({room:room||'', event:event})
+    });
+  } catch(e) {}
+}
+async function startE2ETest() {
+  try { await fetch('/tokyo/voice/e2e/start-test', {method:'POST'}); } catch(e) {}
+  alert('Teste E2E iniciado! Siga o checklist no painel.');
+}
+async function stopE2ETest() {
+  try { await fetch('/tokyo/voice/e2e/stop-test', {method:'POST'}); } catch(e) {}
+}
+async function fetchTroubleshoot() {
+  try {
+    const r = await fetch('/tokyo/voice/e2e/troubleshoot');
+    const d = await r.json();
+    document.getElementById('ts-result').innerHTML = '<b>Status:</b> ' + d.overall_status +
+      '<br><b>Layer:</b> ' + (d.failed_layer || 'none') +
+      '<br><b>Cause:</b> ' + (d.probable_cause || '') +
+      '<br><b>Fix:</b> ' + (d.recommended_fix || '');
+  } catch(e) {}
+}
+
+// API Key Center
+async function refreshAPIKeys() {
+  try {
+    const r = await fetch('/tokyo/security/api-keys');
+    const d = await r.json();
+    const keys = d.api_keys || [];
+    document.getElementById('ak-total').textContent = keys.length;
+    document.getElementById('ak-active').textContent = keys.filter(k => !k.revoked).length;
+    const list = document.getElementById('ak-list');
+    list.innerHTML = keys.map(k =>
+      '<div class="row"><span>' + k.name + '</span><span>' + k.prefix + '...' + k.last4 + '</span>' +
+      '<span class="chip ' + (k.revoked ? 'chip-danger' : 'chip-success') + '">' + (k.revoked ? 'revoked' : 'active') + '</span>' +
+      '<button class="voice-cmd-chip" onclick="revokeKey(\'' + k.id + '\')">Revogar</button></div>'
+    ).join('') || '<div style="text-align:center;color:var(--text3);padding:20px">Nenhuma chave interna criada.</div>';
+  } catch(e) { document.getElementById('ak-list').textContent = 'Erro ao carregar.'; }
+}
+async function createAPIKey() {
+  const name = prompt('Nome da chave:') || 'auto-key';
+  if (!confirm('Criar chave?')) return;
+  try {
+    const r = await fetch('/tokyo/security/api-keys/create', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({name:name, confirm:'CREATE_TOKYO_API_KEY'})
+    });
+    const d = await r.json();
+    if (d.key) {
+      document.getElementById('ak-create-result').innerHTML = '<b>Chave criada!</b><br><code style="color:var(--cyan);word-break:break-all">' + d.key + '</code><br><span style="color:var(--yellow)">' + (d.warning||'') + '</span>';
+    }
+    refreshAPIKeys();
+  } catch(e) {}
+}
+async function revokeKey(id) {
+  if (!confirm('Revogar chave ' + id + '?')) return;
+  try {
+    await fetch('/tokyo/security/api-keys/revoke', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({key_id:id, confirm:'REVOKE_TOKYO_API_KEY'})
+    });
+    refreshAPIKeys();
+  } catch(e) {}
+}
+refreshAPIKeys();
+</script>
+</body>
+</html>

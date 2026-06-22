@@ -1,0 +1,59 @@
+{
+  "mcp_servers": [
+    {
+      "id": "filesystem_mcp",
+      "name": "Filesystem MCP",
+      "enabled": false,
+      "required": false,
+      "status": "not_configured",
+      "base_url_configured": false,
+      "capabilities": ["read_file", "write_file", "list_directory"],
+      "tools": [],
+      "safe_mode": true
+    },
+    {
+      "id": "memory_mcp",
+      "name": "Memory MCP",
+      "enabled": false,
+      "required": false,
+      "status": "not_configured",
+      "base_url_configured": false,
+      "capabilities": ["store", "retrieve", "search"],
+      "tools": [],
+      "safe_mode": true
+    },
+    {
+      "id": "browser_mcp",
+      "name": "Browser MCP",
+      "enabled": false,
+      "required": false,
+      "status": "not_configured",
+      "base_url_configured": false,
+      "capabilities": ["navigate", "click", "screenshot"],
+      "tools": [],
+      "safe_mode": true
+    },
+    {
+      "id": "database_mcp",
+      "name": "Database MCP",
+      "enabled": false,
+      "required": false,
+      "status": "not_configured",
+      "base_url_configured": false,
+      "capabilities": ["query", "read_schema"],
+      "tools": [],
+      "safe_mode": true
+    },
+    {
+      "id": "siberian_mcp",
+      "name": "Sistema Siberian MCP",
+      "enabled": false,
+      "required": false,
+      "status": "planned",
+      "base_url_configured": false,
+      "capabilities": ["companies", "sales", "finance", "stock"],
+      "tools": [],
+      "safe_mode": true
+    }
+  ]
+}

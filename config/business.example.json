@@ -1,0 +1,147 @@
+{
+  "business_units": [
+    {
+      "id": "grupsbunny",
+      "name": "GrupsBunny",
+      "type": "holding",
+      "description": "Holding empresarial - TokyoOS core business",
+      "companies": ["bunny_dreams", "bunny_siberian"],
+      "products": ["sistema_siberian"],
+      "status": "active",
+      "data_source": "pending_api",
+      "dashboard_ready": true
+    },
+    {
+      "id": "bunny_dreams",
+      "name": "Bunny Dreams",
+      "type": "retail",
+      "description": "Varejo - Loja de roupas e acessorios",
+      "parent": "grupsbunny",
+      "units": [
+        {
+          "id": "riverside",
+          "name": "Loja Riverside",
+          "type": "store",
+          "location": "Riverside",
+          "status": "active",
+          "data_source": "pending_api",
+          "siberian_store_id": null
+        },
+        {
+          "id": "teresina",
+          "name": "Loja Teresina",
+          "type": "store",
+          "location": "Teresina",
+          "status": "active",
+          "data_source": "pending_api",
+          "siberian_store_id": null
+        }
+      ],
+      "dashboard_modules": [
+        "daily_sales",
+        "monthly_sales",
+        "monthly_target",
+        "target_gap",
+        "average_ticket",
+        "sales_calendar",
+        "tasks",
+        "stock",
+        "critical_products",
+        "financial_dre",
+        "cash_flow",
+        "break_even",
+        "minimum_cash",
+        "alerts",
+        "tokyo_recommendations"
+      ],
+      "data_source": "pending_api",
+      "status": "active"
+    },
+    {
+      "id": "bunny_siberian",
+      "name": "Bunny Siberian",
+      "type": "systems_company",
+      "description": "Empresa de sistemas - SaaS/ERP B2B",
+      "parent": "grupsbunny",
+      "business_model": {
+        "type": "recurring_revenue",
+        "products": ["sistema_siberian", "consulting", "implementation", "support"],
+        "revenue_streams": ["mrr", "implementation_fees", "support_contracts"],
+        "metrics": ["mrr", "churn_rate", "ltv", "cac", "arpu"],
+        "status": "planned",
+        "data_source": "pending_api"
+      },
+      "dashboard_modules": [
+        "overview",
+        "recurring_revenue",
+        "active_clients",
+        "mrr",
+        "churn",
+        "support_tickets",
+        "implementation_status",
+        "sales_funnel",
+        "sold_modules",
+        "api_status",
+        "siberian_erp_status"
+      ],
+      "data_source": "pending_api",
+      "status": "active"
+    },
+    {
+      "id": "sistema_siberian",
+      "name": "Sistema Siberian ERP",
+      "type": "product",
+      "description": "ERP proprio do GrupsBunny - usado internamente e vendido para terceiros",
+      "parent": "grupsbunny",
+      "usage": {
+        "internal": ["bunny_dreams.riverside", "bunny_dreams.teresina"],
+        "external": "sold_via_bunny_siberian"
+      },
+      "modules": [
+        "companies",
+        "stores",
+        "sales",
+        "products",
+        "stock",
+        "finance",
+        "clients",
+        "users",
+        "reports",
+        "recurring",
+        "support",
+        "dashboard"
+      ],
+      "connector": {
+        "id": "sistema_siberian",
+        "enabled": false,
+        "required": false,
+        "status": "not_configured",
+        "mode": "read_only",
+        "safe_mode": true
+      },
+      "data_source": "pending_api",
+      "status": "planned"
+    }
+  ],
+  "dashboard_structure": {
+    "grupsbunny": {
+      "overview": "Visao geral do GrupsBunny",
+      "sales_by_store": "Vendas por loja Bunny Dreams",
+      "targets": "Metas por loja",
+      "calendar": "Calendario de vendas",
+      "tasks": "Tarefas pendentes",
+      "recurring_revenue": "Receita recorrente Bunny Siberian",
+      "siberian_status": "Status do Sistema Siberian",
+      "connected_apis": "APIs conectadas",
+      "health_status": "Health/status das empresas",
+      "consolidated_finance": "Financeiro consolidado",
+      "dre": "DRE",
+      "cash_flow": "Fluxo de Caixa",
+      "break_even": "Ponto de Equilibrio",
+      "financial_cycle": "Ciclo Financeiro",
+      "minimum_cash": "Caixa Minimo",
+      "alerts": "Alertas",
+      "tokyo_recommendations": "Recomendacoes da Tokyo IA"
+    }
+  }
+}

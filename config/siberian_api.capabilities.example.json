@@ -1,0 +1,20 @@
+{
+  "api": "sistema_siberian",
+  "version": "1.0",
+  "mode": "read_only",
+  "operations_allowed": ["GET"],
+  "operations_blocked": ["POST", "PUT", "PATCH", "DELETE"],
+  "capabilities": [
+    {"id": "companies", "name": "Companies", "method": "GET", "path": "/api/companies", "category": "companies", "enabled": true, "safe_method": true, "read_only": true, "requires_auth": true, "status": "active"},
+    {"id": "stores", "name": "Stores", "method": "GET", "path": "/api/stores", "category": "stores", "enabled": true, "safe_method": true, "read_only": true, "requires_auth": true, "status": "active"},
+    {"id": "sales", "name": "Sales Summary", "method": "GET", "path": "/api/sales/summary", "category": "sales", "enabled": true, "safe_method": true, "read_only": true, "requires_auth": true, "status": "active"},
+    {"id": "products", "name": "Products", "method": "GET", "path": "/api/products/summary", "category": "products", "enabled": true, "safe_method": true, "read_only": true, "requires_auth": true, "status": "active"},
+    {"id": "stock", "name": "Stock", "method": "GET", "path": "/api/stock/summary", "category": "stock", "enabled": true, "safe_method": true, "read_only": true, "requires_auth": true, "status": "active"},
+    {"id": "finance", "name": "Finance Summary", "method": "GET", "path": "/api/finance/summary", "category": "finance", "enabled": true, "safe_method": true, "read_only": true, "requires_auth": true, "status": "active"},
+    {"id": "customers", "name": "Customers", "method": "GET", "path": "/api/customers", "category": "customers", "enabled": false, "safe_method": true, "read_only": true, "requires_auth": true, "status": "planned"},
+    {"id": "users", "name": "Users", "method": "GET", "path": "/api/users", "category": "users", "enabled": false, "safe_method": true, "read_only": true, "requires_auth": true, "status": "planned"},
+    {"id": "reports", "name": "Reports", "method": "GET", "path": "/api/reports", "category": "reports", "enabled": false, "safe_method": true, "read_only": true, "requires_auth": true, "status": "planned"},
+    {"id": "recurrence", "name": "Recurring Revenue", "method": "GET", "path": "/api/recurrence", "category": "recurrence", "enabled": false, "safe_method": true, "read_only": true, "requires_auth": true, "status": "planned"},
+    {"id": "support", "name": "Support Tickets", "method": "GET", "path": "/api/support", "category": "support", "enabled": false, "safe_method": true, "read_only": true, "requires_auth": true, "status": "planned"}
+  ]
+}

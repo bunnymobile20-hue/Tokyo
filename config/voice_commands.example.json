@@ -1,0 +1,32 @@
+{
+  "voice": {
+    "provider": "LiveKit + Google Gemini Realtime",
+    "voice_name": "Charon",
+    "default_activation": "push_to_talk",
+    "wake_word": "Tokyo",
+    "wake_word_status": "planned",
+    "commands_executable": false,
+    "preview_enabled": true,
+    "reason": "Voice commands are preview-only in this phase. No real actions executed."
+  },
+  "commands": [
+    {"id": "open_dashboard", "command": "Tokyo, abrir dashboard", "target": "/ui", "category": "navigation", "status": "planned"},
+    {"id": "open_grupsbunny", "command": "Tokyo, abrir GrupsBunny", "target": "/ui#page-grupsbunny", "category": "navigation", "status": "planned"},
+    {"id": "open_bunny_dreams", "command": "Tokyo, abrir Bunny Dreams", "target": "/ui#page-grupsbunny", "category": "business", "status": "planned"},
+    {"id": "open_riverside", "command": "Tokyo, abrir loja Riverside", "target": "/ui#page-grupsbunny", "category": "business", "status": "planned"},
+    {"id": "open_teresina", "command": "Tokyo, abrir loja Teresina", "target": "/ui#page-grupsbunny", "category": "business", "status": "planned"},
+    {"id": "open_finance", "command": "Tokyo, abrir financeiro", "target": "/ui#page-finance", "category": "finance", "status": "planned"},
+    {"id": "open_mcp", "command": "Tokyo, abrir MCP", "target": "/ui#page-mcp", "category": "connector", "status": "planned"},
+    {"id": "open_api_hub", "command": "Tokyo, abrir API Hub", "target": "/ui#page-apihub", "category": "connector", "status": "planned"},
+    {"id": "open_zimaos", "command": "Tokyo, abrir ZimaOS", "target": "/ui#page-zimaos", "category": "system", "status": "planned"},
+    {"id": "system_status", "command": "Tokyo, status do sistema", "target": "/tokyo/system/health", "category": "system", "status": "planned"}
+  ],
+  "states": {
+    "offline": {"orb_color": "#606080", "label": "Offline"},
+    "idle": {"orb_color": "#7c3aed", "label": "Aguardando"},
+    "listening": {"orb_color": "#dc2626", "label": "Ouvindo"},
+    "thinking": {"orb_color": "#06b6d4", "label": "Processando"},
+    "speaking": {"orb_color": "#22c55e", "label": "Falando"},
+    "error": {"orb_color": "#eab308", "label": "Erro"}
+  }
+}

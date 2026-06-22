@@ -1,0 +1,182 @@
+{
+  "finance_models": [
+    {
+      "id": "dre",
+      "name": "DRE (Demonstrativo do Resultado do Exercicio)",
+      "description": "Demonstrativo de resultado financeiro por periodo",
+      "scope": ["grupsbunny", "bunny_dreams", "riverside", "teresina", "bunny_siberian"],
+      "data_source": "pending_api",
+      "status": "planned",
+      "source_reference": [
+        "Modelo+de+DRE.xlsx",
+        "Estrutura+de+DRE.xlsx"
+      ],
+      "fields": [
+        {"key": "gross_revenue", "label": "Receita Bruta", "type": "currency"},
+        {"key": "deductions", "label": "Deducoes", "type": "currency"},
+        {"key": "net_revenue", "label": "Receita Liquida", "type": "currency"},
+        {"key": "cogs", "label": "CMV / Custo Mercadoria Vendida", "type": "currency"},
+        {"key": "gross_margin", "label": "Margem Bruta", "type": "percentage"},
+        {"key": "fixed_expenses", "label": "Despesas Fixas", "type": "currency"},
+        {"key": "variable_expenses", "label": "Despesas Variaveis", "type": "currency"},
+        {"key": "operational_result", "label": "Resultado Operacional", "type": "currency"},
+        {"key": "net_profit", "label": "Lucro/Prejuizo Liquido", "type": "currency"}
+      ],
+      "formulas_planned": [
+        "net_revenue = gross_revenue - deductions",
+        "gross_margin = (net_revenue - cogs) / net_revenue * 100",
+        "operational_result = net_revenue - cogs - fixed_expenses - variable_expenses",
+        "net_profit = operational_result +/- other_income_expenses"
+      ],
+      "ui_card": "GrupsBunny > Financeiro > DRE",
+      "ui_status": "placeholder_no_data"
+    },
+    {
+      "id": "cash_flow",
+      "name": "Fluxo de Caixa",
+      "description": "Controle de entradas e saidas de caixa",
+      "scope": ["grupsbunny", "bunny_dreams", "riverside", "teresina", "bunny_siberian"],
+      "data_source": "pending_api",
+      "status": "planned",
+      "source_reference": [
+        "Estrutura+de+Fluxo+de+Caixa.xlsx"
+      ],
+      "fields": [
+        {"key": "initial_balance", "label": "Saldo Inicial", "type": "currency"},
+        {"key": "inflows", "label": "Entradas", "type": "currency"},
+        {"key": "outflows", "label": "Saidas", "type": "currency"},
+        {"key": "final_balance", "label": "Saldo Final", "type": "currency"},
+        {"key": "accounts_payable", "label": "Contas a Pagar", "type": "currency"},
+        {"key": "accounts_receivable", "label": "Contas a Receber", "type": "currency"},
+        {"key": "cash_projection", "label": "Projecao de Caixa", "type": "currency"}
+      ],
+      "formulas_planned": [
+        "final_balance = initial_balance + inflows - outflows",
+        "cash_projection = projected_inflows - projected_outflows"
+      ],
+      "periods": ["daily", "weekly", "monthly"],
+      "ui_card": "GrupsBunny > Financeiro > Fluxo de Caixa",
+      "ui_status": "placeholder_no_data"
+    },
+    {
+      "id": "break_even",
+      "name": "Ponto de Equilibrio",
+      "description": "Calculo do faturamento minimo para cobrir custos",
+      "scope": ["grupsbunny", "bunny_dreams", "riverside", "teresina", "bunny_siberian"],
+      "data_source": "pending_api",
+      "status": "planned",
+      "source_reference": [
+        "Ponto de Equilibrio.xlsx"
+      ],
+      "fields": [
+        {"key": "fixed_costs", "label": "Custos Fixos", "type": "currency"},
+        {"key": "contribution_margin", "label": "Margem de Contribuicao", "type": "percentage"},
+        {"key": "break_even_revenue", "label": "Faturamento Minimo (PE)", "type": "currency"},
+        {"key": "desired_profit", "label": "Lucro Desejado", "type": "currency"},
+        {"key": "revenue_with_profit", "label": "Faturamento com Lucro Desejado", "type": "currency"}
+      ],
+      "formulas_planned": [
+        "break_even_revenue = fixed_costs / (contribution_margin / 100)",
+        "revenue_with_profit = (fixed_costs + desired_profit) / (contribution_margin / 100)"
+      ],
+      "ui_card": "GrupsBunny > Financeiro > Ponto de Equilibrio",
+      "ui_status": "placeholder_no_data"
+    },
+    {
+      "id": "operational_cycle",
+      "name": "Ciclo Operacional e Financeiro",
+      "description": "Analise do ciclo operacional, financeiro e necessidade de capital de giro",
+      "scope": ["grupsbunny", "bunny_dreams", "riverside", "teresina"],
+      "data_source": "pending_api",
+      "status": "planned",
+      "source_reference": [
+        "Ciclo Operaciona, Financeiro e Caixa Minimo.xlsx",
+        "Ciclo Operaciona, Financeiro e Caixa Minimo (1).xlsx"
+      ],
+      "fields": [
+        {"key": "avg_stock_days", "label": "Prazo Medio de Estoque (dias)", "type": "number"},
+        {"key": "avg_receivables_days", "label": "Prazo Medio de Recebimento (dias)", "type": "number"},
+        {"key": "avg_payables_days", "label": "Prazo Medio de Pagamento (dias)", "type": "number"},
+        {"key": "operational_cycle_days", "label": "Ciclo Operacional (dias)", "type": "number"},
+        {"key": "financial_cycle_days", "label": "Ciclo Financeiro (dias)", "type": "number"},
+        {"key": "working_capital_need", "label": "Necessidade de Capital de Giro", "type": "currency"}
+      ],
+      "formulas_planned": [
+        "operational_cycle = avg_stock_days + avg_receivables_days",
+        "financial_cycle = operational_cycle - avg_payables_days",
+        "working_capital_need = avg_daily_costs * financial_cycle_days"
+      ],
+      "ui_card": "GrupsBunny > Financeiro > Ciclo Financeiro",
+      "ui_status": "placeholder_no_data"
+    },
+    {
+      "id": "minimum_cash",
+      "name": "Caixa Minimo",
+      "description": "Calculo da reserva minima de caixa para operacao",
+      "scope": ["grupsbunny", "bunny_dreams", "riverside", "teresina"],
+      "data_source": "pending_api",
+      "status": "planned",
+      "source_reference": [
+        "Ciclo Operaciona, Financeiro e Caixa Minimo.xlsx",
+        "Ciclo Operaciona, Financeiro e Caixa Minimo (1).xlsx"
+      ],
+      "fields": [
+        {"key": "avg_daily_expenses", "label": "Despesa Media Diaria", "type": "currency"},
+        {"key": "safety_days", "label": "Dias de Seguranca", "type": "number"},
+        {"key": "minimum_cash", "label": "Caixa Minimo Recomendado", "type": "currency"},
+        {"key": "recommended_reserve", "label": "Reserva Recomendada", "type": "currency"}
+      ],
+      "formulas_planned": [
+        "minimum_cash = avg_daily_expenses * safety_days",
+        "recommended_reserve = minimum_cash * 1.5"
+      ],
+      "ui_card": "GrupsBunny > Financeiro > Caixa Minimo",
+      "ui_status": "placeholder_no_data"
+    },
+    {
+      "id": "financial_dashboard",
+      "name": "Dashboard Financeiro Consolidado",
+      "description": "Visao consolidada de todos os indicadores financeiros do GrupsBunny",
+      "scope": ["grupsbunny", "bunny_dreams", "bunny_siberian"],
+      "data_source": "pending_api",
+      "status": "planned",
+      "includes": ["dre", "cash_flow", "break_even", "operational_cycle", "minimum_cash"],
+      "ui_card": "GrupsBunny > Financeiro",
+      "ui_status": "placeholder_no_data"
+    },
+    {
+      "id": "bunny_intelligence_upload",
+      "name": "Bunny Intelligence Bank - Planilhas Financeiras",
+      "description": "Area futura para upload de planilhas financeiras",
+      "scope": ["grupsbunny"],
+      "data_source": "manual_upload_future",
+      "status": "planned",
+      "accepted_formats": ["xlsx", "csv", "ods"],
+      "accepted_sheets": [
+        "DRE",
+        "Fluxo de Caixa",
+        "Contas a Pagar",
+        "Contas a Receber",
+        "Vendas",
+        "Estoque",
+        "Ciclo Financeiro",
+        "Ponto de Equilibrio"
+      ],
+      "ui_card": "Bunny Intelligence Bank > Planilhas Financeiras",
+      "ui_status": "upload_pending_parser_pending"
+    }
+  ],
+  "financial_data_policy": {
+    "no_fake_data": true,
+    "placeholder_message": "Dados financeiros ainda nao conectados. Configure Sistema Siberian API ou importe planilhas autorizadas.",
+    "status_labels": {
+      "not_configured": "Nao configurado",
+      "pending_api": "Aguardando API",
+      "manual_input_pending": "Aguardando entrada manual",
+      "planned": "Planejado",
+      "upload_pending": "Upload pendente",
+      "parser_pending": "Processamento pendente"
+    },
+    "token_exposed": false
+  }
+}

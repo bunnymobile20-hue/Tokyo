@@ -1,0 +1,95 @@
+{
+  "release": {
+    "version": "phase-2-read-only-data-layer",
+    "codename": "TokyoOS Read-Only Data Layer",
+    "status": "stable_checkpoint",
+    "date": "2026-06-21",
+    "app_url": "http://localhost:8788/ui",
+    "api_base": "http://localhost:8788",
+    "environment": "zimaos",
+    "safe_mode": true,
+    "token_exposed": false,
+    "external_write_enabled": false,
+    "fake_financial_values": false
+  },
+  "phase_2_deliverables": {
+    "finance_engine": {
+      "status": "active",
+      "modules": ["dre", "cash_flow", "break_even", "operational_cycle", "financial_cycle", "minimum_cash"],
+      "all_return_pending_validation": true,
+      "source": "finance_engine/"
+    },
+    "siberian_connector": {
+      "status": "not_configured",
+      "mode": "read_only",
+      "required": false,
+      "safe_mode": true,
+      "endpoints": 8,
+      "external_writes": 0,
+      "allowed_operations": ["GET"],
+      "blocked_operations": ["POST", "PUT", "PATCH", "DELETE"]
+    },
+    "upload_center": {
+      "status": "planned",
+      "upload_enabled": false,
+      "reason": "upload_parser_pending",
+      "endpoints": 3,
+      "accepted_formats": [".xlsx", ".csv"],
+      "blocked_formats": [".xlsm", ".exe", ".zip", ".sh", ".py", ".bat", ".ps1"]
+    },
+    "business_data_layer": {
+      "endpoints": 3,
+      "scopes": ["grupsbunny", "bunny_dreams", "riverside", "teresina", "bunny_siberian", "sistema_siberian"],
+      "data_sources": ["pending_api", "manual_input", "spreadsheet_upload", "spreadsheet_reference"]
+    },
+    "finance_calculation_endpoints": 6,
+    "audit_log": {
+      "format": "JSONL",
+      "path": "data/audit/phase_2_finance_data_layer.jsonl",
+      "token_redaction": true
+    },
+    "documentation": 6
+  },
+  "endpoints_total": 58,
+  "test_results": {
+    "phase_1_static": {"passed": 104, "failed": 0, "file": "scripts/test_phase_1_professional_core.py"},
+    "phase_1_regression_guard": {"passed": 153, "failed": 0, "file": "scripts/test_phase_1_regression_guard.py"},
+    "phase_2_static": {"passed": 134, "failed": 0, "file": "scripts/test_phase_2_read_only_data_layer.py"},
+    "phase_1_runtime": {"passed": 47, "failed": 0, "file": "scripts/runtime_validate_phase_1_professional_core.py"},
+    "phase_1_checkpoint": {"passed": 36, "failed": 0, "file": "scripts/runtime_validate_phase_1_checkpoint.py"},
+    "phase_2_runtime": {"passed": 36, "failed": 0, "file": "scripts/runtime_validate_phase_2_read_only_data_layer.py"},
+    "phase_2_checkpoint": {"file": "scripts/runtime_validate_phase_2_checkpoint.py", "status": "pending_execution"},
+    "total_confirmed_before_checkpoint": 510
+  },
+  "security": {
+    "token_exposed": false,
+    "safe_mode": true,
+    "external_write_enabled": false,
+    "fake_financial_values": false,
+    "destructive_ops_blocked": true,
+    "auth_enabled": true
+  },
+  "voice": {
+    "preserved": true,
+    "agent_file": "agent.py",
+    "provider": "LiveKit + Google Gemini Realtime"
+  },
+  "docker_zimaos": {
+    "port": 8788,
+    "volume": "/DATA/AppData/tokyoos",
+    "x_casaos": true,
+    "store_app_id": "tokyoos",
+    "network_mode_host": false
+  },
+  "source_files": {
+    "backend": "app.py (1106 lines)",
+    "finance_engine": "finance_engine/ (__init__.py + audit.py)",
+    "voice_agent": "agent.py (preserved)",
+    "prompts": "prompts.py (preserved)",
+    "config_dir": "config/ (6 JSON files)",
+    "docs_dir": "docs/ (21 files)",
+    "scripts_dir": "scripts/ (7 test/validator files)",
+    "interface_dir": "interface/index.html",
+    "release_dir": "release/"
+  }
+}

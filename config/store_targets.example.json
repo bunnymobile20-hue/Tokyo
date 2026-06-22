@@ -1,0 +1,22 @@
+{
+  "stores": {
+    "riverside": {
+      "name": "Loja Riverside",
+      "type": "store",
+      "company": "bunny_dreams",
+      "status": "active",
+      "monthly_targets": [],
+      "data_source": "pending_api",
+      "message": "Metas mensais serao configuradas futuramente via API ou manual."
+    },
+    "teresina": {
+      "name": "Loja Teresina",
+      "type": "store",
+      "company": "bunny_dreams",
+      "status": "active",
+      "monthly_targets": [],
+      "data_source": "pending_api",
+      "message": "Metas mensais serao configuradas futuramente via API ou manual."
+    }
+  }
+}

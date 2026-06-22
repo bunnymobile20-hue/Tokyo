@@ -1,0 +1,45 @@
+{
+  "release": {
+    "version": "phase-3c-zimaos-ready",
+    "codename": "TokyoOS ZimaOS Ready",
+    "status": "stable_checkpoint",
+    "date": "2026-06-21",
+    "app_url": "http://localhost:8788/ui",
+    "setup_url": "http://localhost:8788/setup"
+  },
+  "deploy": {
+    "app_port": 8788,
+    "data_path": "/DATA/AppData/tokyoos",
+    "docker_compose_status": "valid",
+    "x_casaos_status": "configured",
+    "healthcheck_status": "active",
+    "docker_installed_on_host": false,
+    "network_mode": "bridge",
+    "external_tools_count": 11,
+    "mcp_servers_count": 5,
+    "auto_install_enabled": false
+  },
+  "ui": {
+    "install_mode": "/setup",
+    "use_mode": "/ui",
+    "pages": 14,
+    "voice_preview": true,
+    "mcp_panel": true,
+    "api_hub": true,
+    "zimaos_deploy": true,
+    "tools_store": true
+  },
+  "test_results": {
+    "phase_1_static": 104,
+    "phase_1_regression": 153,
+    "phase_2_static": 133,
+    "phase_2_regression": 129,
+    "phase_3a_static": 108,
+    "phase_3b_static": 128,
+    "phase_3c_static": 118,
+    "phase_3c_runtime": 19,
+    "total": 892,
+    "failed": 0
+  },
+  "token_exposed": false
+}

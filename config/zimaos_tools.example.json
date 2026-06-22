@@ -1,0 +1,34 @@
+{
+  "zimaos": {
+    "app_port": 8788,
+    "data_path": "/DATA/AppData/tokyoos",
+    "volume_mount": "/DATA/AppData/tokyoos:/data/tokyo",
+    "network_mode": "bridge",
+    "restart_policy": "unless-stopped",
+    "store_app_id": "tokyoos",
+    "env": "zimaos",
+    "scheme": "http",
+    "index": "/ui",
+    "x_casaos": true,
+    "healthcheck_endpoint": "/tokyo/system/health"
+  },
+  "future_directories": {
+    "/data/tokyo/tools": "External tools installation directory",
+    "/data/tokyo/connectors": "Connector configurations",
+    "/data/tokyo/mcp": "MCP server data",
+    "/data/tokyo/logs": "Application logs",
+    "/data/tokyo/uploads": "Uploaded files",
+    "/data/tokyo/cache": "Read cache",
+    "/data/tokyo/config": "Runtime configurations"
+  },
+  "external_tools_readiness": {
+    "hermes": {"planned": true, "install_method": "docker_compose", "auto_install": false},
+    "mcp": {"planned": true, "install_method": "docker_compose", "auto_install": false},
+    "ollama": {"planned": true, "install_method": "docker_compose", "auto_install": false},
+    "openwebui": {"planned": true, "install_method": "docker_compose", "auto_install": false},
+    "browser_use": {"planned": true, "install_method": "docker_compose", "auto_install": false},
+    "firecrawl": {"planned": true, "api_only": true, "auto_install": false},
+    "n8n": {"planned": true, "install_method": "docker_compose", "auto_install": false},
+    "openclaw": {"planned": true, "install_method": "docker_compose", "auto_install": false}
+  }
+}

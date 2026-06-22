@@ -1,0 +1,181 @@
+{
+  "release": {
+    "version": "phase-1-professional-core",
+    "codename": "TokyoOS Stable Checkpoint",
+    "status": "stable_checkpoint",
+    "date": "2026-06-21",
+    "app_url": "http://localhost:8788/ui",
+    "api_base": "http://localhost:8788",
+    "environment": "zimaos",
+    "safe_mode": true,
+    "token_exposed": false
+  },
+  "test_results": {
+    "static_test": {
+      "file": "scripts/test_phase_1_professional_core.py",
+      "passed": 104,
+      "failed": 0,
+      "status": "SAFE_TO_CONTINUE_TOKYOOS_PROFESSIONAL_CORE"
+    },
+    "runtime_test": {
+      "file": "scripts/runtime_validate_phase_1_professional_core.py",
+      "passed": 47,
+      "failed": 0,
+      "status": "SAFE_TO_CONTINUE_TOKYOOS_PROFESSIONAL_CORE"
+    },
+    "regression_guard": {
+      "file": "scripts/test_phase_1_regression_guard.py",
+      "passed": 153,
+      "failed": 0,
+      "status": "SAFE_TO_START_PHASE_2"
+    },
+    "runtime_checkpoint": {
+      "file": "scripts/runtime_validate_phase_1_checkpoint.py",
+      "passed": 36,
+      "failed": 0,
+      "status": "SAFE_TO_START_PHASE_2"
+    },
+    "total_confirmed": 340,
+    "phase_2_test_results": {
+      "phase_2_static": {
+        "file": "scripts/test_phase_2_read_only_data_layer.py",
+        "passed": 134,
+        "failed": 0,
+        "status": "SAFE_TO_CONTINUE_PHASE_2_READ_ONLY_DATA_LAYER"
+      },
+      "phase_2_runtime": {
+        "file": "scripts/runtime_validate_phase_2_read_only_data_layer.py",
+        "passed": 36,
+        "failed": 0,
+        "status": "SAFE_TO_CONTINUE_PHASE_2_READ_ONLY_DATA_LAYER"
+      },
+      "phase_2_total": 170,
+      "grand_total_all_phases": 510
+    },
+    "docker_test": {
+      "status": "DOCKER_NOT_INSTALLED",
+      "message": "Docker compose config not tested in this environment. Dockerfile and docker-compose.yml are valid."
+    }
+  },
+  "main_routes": [
+    {"method": "GET", "path": "/ui", "description": "Dashboard GrupsBunny"},
+    {"method": "GET", "path": "/tokyo/system/health", "description": "System health"},
+    {"method": "GET", "path": "/tokyo/setup/status", "description": "Setup wizard status"},
+    {"method": "GET", "path": "/tokyo/setup/checklist", "description": "Setup checklist"},
+    {"method": "GET", "path": "/tokyo/doctor", "description": "System diagnostics"},
+    {"method": "GET", "path": "/tokyo/llm/status", "description": "LLM Gateway status"},
+    {"method": "GET", "path": "/tokyo/providers/registry", "description": "LLM providers registry"},
+    {"method": "GET", "path": "/tokyo/providers/status", "description": "Providers status"},
+    {"method": "GET", "path": "/tokyo/integrations/registry", "description": "All integrations"},
+    {"method": "GET", "path": "/tokyo/integrations/status", "description": "Integrations summary"},
+    {"method": "GET", "path": "/tokyo/connectors/registry", "description": "Connectors registry"},
+    {"method": "GET", "path": "/tokyo/plugins/registry", "description": "Plugins registry"},
+    {"method": "GET", "path": "/tokyo/api-hub/status", "description": "API Hub status"},
+    {"method": "GET", "path": "/tokyo/mcp/status", "description": "MCP optional status"},
+    {"method": "GET", "path": "/tokyo/memory/status", "description": "Memory systems"},
+    {"method": "GET", "path": "/tokyo/voice/status", "description": "Voice agent status"},
+    {"method": "GET", "path": "/tokyo/security/status", "description": "Security status"},
+    {"method": "GET", "path": "/tokyo/business/status", "description": "Business units"},
+    {"method": "GET", "path": "/tokyo/grupsbunny/status", "description": "GrupsBunny holding"},
+    {"method": "GET", "path": "/tokyo/bunnydreams/status", "description": "Bunny Dreams retail"},
+    {"method": "GET", "path": "/tokyo/bunnysiberian/status", "description": "Bunny Siberian B2B"},
+    {"method": "GET", "path": "/tokyo/siberian/status", "description": "Sistema Siberian ERP"},
+    {"method": "GET", "path": "/tokyo/finance/status", "description": "Finance overview"},
+    {"method": "GET", "path": "/tokyo/finance/models", "description": "Finance models"},
+    {"method": "GET", "path": "/tokyo/finance/references", "description": "Reference spreadsheets"}
+  ],
+  "connectors_count": 22,
+  "connectors": [
+    {"id": "livekit", "required": false, "mode": "core_voice", "status": "not_configured"},
+    {"id": "gemini", "required": false, "mode": "optional", "status": "not_configured"},
+    {"id": "openai", "required": false, "mode": "optional", "status": "not_configured"},
+    {"id": "mem0", "required": false, "mode": "optional", "status": "not_configured"},
+    {"id": "sistema_siberian", "required": false, "mode": "read_only", "status": "not_configured"},
+    {"id": "bunny_siberian", "required": false, "mode": "read_only", "status": "not_configured"},
+    {"id": "hermes", "required": false, "mode": "optional", "status": "not_configured"},
+    {"id": "mcp", "required": false, "mode": "optional", "status": "not_configured"},
+    {"id": "ollama", "required": false, "mode": "optional", "status": "not_configured"},
+    {"id": "openwebui", "required": false, "mode": "optional", "status": "not_configured"},
+    {"id": "browser_use", "required": false, "mode": "optional", "status": "not_configured"},
+    {"id": "firecrawl", "required": false, "mode": "optional", "status": "not_configured"},
+    {"id": "n8n", "required": false, "mode": "optional", "status": "not_configured"},
+    {"id": "openclaw", "required": false, "mode": "optional", "status": "not_configured"},
+    {"id": "apple_macos_agent", "required": false, "mode": "optional", "status": "planned"},
+    {"id": "telegram", "required": false, "mode": "optional", "status": "not_configured"},
+    {"id": "whatsapp", "required": false, "mode": "optional", "status": "not_configured"},
+    {"id": "google_calendar", "required": false, "mode": "optional", "status": "not_configured"},
+    {"id": "gmail", "required": false, "mode": "optional", "status": "not_configured"},
+    {"id": "google_drive", "required": false, "mode": "optional", "status": "not_configured"},
+    {"id": "obsidian", "required": false, "mode": "optional", "status": "not_configured"},
+    {"id": "local_memory", "required": false, "status": "configured"}
+  ],
+  "providers": [
+    {"id": "gemini", "type": "primary", "voice": true, "realtime": true},
+    {"id": "openai", "type": "fallback", "voice": true},
+    {"id": "openai_compatible", "type": "secondary", "voice": false},
+    {"id": "ollama", "type": "local_optional", "required": false},
+    {"id": "openwebui", "type": "local_optional", "required": false}
+  ],
+  "business_modules": {
+    "grupsbunny": {"type": "holding", "status": "active", "data_source": "pending_api"},
+    "bunny_dreams": {
+      "type": "retail",
+      "status": "active",
+      "data_source": "pending_api",
+      "stores": ["riverside", "teresina"]
+    },
+    "bunny_siberian": {
+      "type": "systems_company",
+      "model": "recurring_revenue",
+      "status": "active",
+      "data_source": "pending_api"
+    },
+    "sistema_siberian": {
+      "type": "own_product",
+      "status": "not_configured",
+      "mode": "read_only",
+      "safe_mode": true
+    }
+  },
+  "finance_modules": ["dre", "cash_flow", "break_even", "operational_cycle", "minimum_cash", "financial_dashboard"],
+  "finance_data_policy": {
+    "no_fake_data": true,
+    "data_source": "pending_api",
+    "reference_spreadsheets_recognized": 6,
+    "reference_spreadsheets_path": "reference_materials/finance/",
+    "used_as_business_models_only": true
+  },
+  "docker_files": ["Dockerfile", "docker-compose.yml"],
+  "zimaos": {
+    "ready": true,
+    "port": 8788,
+    "volume": "/DATA/AppData/tokyoos",
+    "x_casaos": true,
+    "network_mode_host": false,
+    "store_app_id": "tokyoos"
+  },
+  "security": {
+    "safe_mode": true,
+    "token_exposed": false,
+    "auth_enabled": true,
+    "safety_gate": true,
+    "destructive_ops_blocked": true
+  },
+  "voice": {
+    "preserved": true,
+    "provider": "LiveKit",
+    "llm": "Google Gemini Realtime",
+    "voice_name": "Charon",
+    "agent_file": "agent.py"
+  },
+  "source_files": {
+    "backend": "app.py",
+    "voice_agent": "agent.py",
+    "prompts": "prompts.py",
+    "config_dir": "config/",
+    "docs_dir": "docs/",
+    "scripts_dir": "scripts/",
+    "interface_dir": "interface/",
+    "release_dir": "release/"
+  }
+}
