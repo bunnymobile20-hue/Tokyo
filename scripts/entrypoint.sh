@@ -38,8 +38,9 @@ function shutdown() {
 
 trap shutdown SIGINT SIGTERM
 
-# Wait for any process to exit
-wait -n
+# Wait for the main app to exit. The voice agent might crash on CPUs without AVX (Illegal instruction), 
+# but we shouldn't kill the main dashboard if that happens.
+wait "$APP_PID"
 
-echo "[WARN] One of the TokyoOS processes exited unexpectedly. Shutting down."
+echo "[WARN] TokyoOS main interface exited unexpectedly. Shutting down."
 shutdown
