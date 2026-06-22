@@ -8,4 +8,5 @@ requests
 python-dotenv
 fastapi>=0.100.0
 uvicorn[standard]>=0.23.0
-mem0aihttpx
+mem0ai
+httpx
