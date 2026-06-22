@@ -76,6 +76,8 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
 /* Chips */
 .chip{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.3px}
 .chip-success{background:rgba(34,197,94,.15);color:var(--green)}
+.chip-error{background:rgba(239,68,68,.15);color:var(--red)}
+.chip-pending{background:rgba(245,158,11,.15);color:#f59e0b}
 .chip-warning{background:rgba(234,179,8,.15);color:var(--yellow)}
 .chip-danger{background:rgba(220,38,38,.15);color:var(--red)}
 .chip-info{background:rgba(6,182,212,.15);color:var(--cyan)}
@@ -876,6 +878,18 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
           <input type="text" id="setup-ollama-url" class="input-theme" placeholder="http://host.docker.internal:11434">
         </div>
         <div class="form-group">
+          <label>Ollama Model</label>
+          <input type="text" id="setup-ollama-model" class="input-theme" placeholder="llama3">
+        </div>
+        <div class="form-group">
+          <label>Local Agent LLM Provider</label>
+          <select id="setup-global-local-llm" class="input-theme">
+            <option value="ollama">Ollama (Local)</option>
+            <option value="tokyo_default">Tokyo Default (Cloud)</option>
+          </select>
+          <p style="font-size:10px;color:var(--text2);margin-top:4px;">Define se as ferramentas secundárias usarão a nuvem ou o processamento local.</p>
+        </div>
+        <div class="form-group">
           <label>Browser Use URL</label>
           <input type="text" id="setup-browser-url" class="input-theme" placeholder="http://host.docker.internal:3000">
         </div>
@@ -985,15 +999,22 @@ document.querySelectorAll('.sidebar-item').forEach(btn => {
 // Module Statuses
 async function updateModuleStatuses() {
   try {
-    const r = await fetch('/tokyo/system/env');
+    const r = await fetch('/tokyo/system/health/integrations');
     const d = await r.json();
-    if (!d.env) return;
+    if (!d.statuses) return;
     
     document.querySelectorAll('[data-env]').forEach(el => {
       const key = el.getAttribute('data-env');
-      if (d.env[key] === 'configured' || (d.env[key] && d.env[key] !== '')) {
+      const status = d.statuses[key];
+      if (status === 'connected') {
         el.className = 'chip chip-success';
         el.textContent = 'Ativo';
+      } else if (status === 'error') {
+        el.className = 'chip chip-error';
+        el.textContent = 'Erro de Conexão';
+      } else {
+        el.className = 'chip chip-pending';
+        el.textContent = 'Pendente';
       }
     });
   } catch(e) {}
@@ -1041,6 +1062,8 @@ async function loadEnvData() {
       if (d.env.HERMES_BASE_URL) document.getElementById('setup-hermes-url').value = d.env.HERMES_BASE_URL;
       if (d.env.OPENCLAW_BASE_URL) document.getElementById('setup-openclaw-url').value = d.env.OPENCLAW_BASE_URL;
       if (d.env.OLLAMA_BASE_URL) document.getElementById('setup-ollama-url').value = d.env.OLLAMA_BASE_URL;
+      if (d.env.OLLAMA_MODEL) document.getElementById('setup-ollama-model').value = d.env.OLLAMA_MODEL;
+      if (d.env.GLOBAL_LOCAL_LLM_PROVIDER) document.getElementById('setup-global-local-llm').value = d.env.GLOBAL_LOCAL_LLM_PROVIDER;
       if (d.env.BROWSER_USE_BASE_URL) document.getElementById('setup-browser-url').value = d.env.BROWSER_USE_BASE_URL;
       if (d.env.N8N_BASE_URL) document.getElementById('setup-n8n-url').value = d.env.N8N_BASE_URL;
     }
@@ -1071,6 +1094,8 @@ async function finishSetup() {
     "HERMES_BASE_URL": document.getElementById('setup-hermes-url').value,
     "OPENCLAW_BASE_URL": document.getElementById('setup-openclaw-url').value,
     "OLLAMA_BASE_URL": document.getElementById('setup-ollama-url').value,
+    "OLLAMA_MODEL": document.getElementById('setup-ollama-model').value,
+    "GLOBAL_LOCAL_LLM_PROVIDER": document.getElementById('setup-global-local-llm').value,
     "BROWSER_USE_BASE_URL": document.getElementById('setup-browser-url').value,
     "N8N_BASE_URL": document.getElementById('setup-n8n-url').value,
   };

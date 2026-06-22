@@ -12,6 +12,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
+import httpx
 
 from finance_engine import (
     calculate_dre, calculate_cash_flow, calculate_break_even,
@@ -1266,7 +1267,8 @@ async def system_env():
     public_keys = [
         "GEMINI_MODEL", "OPENAI_MODEL", "TOKYO_DEFAULT_LLM_PROVIDER", 
         "LIVEKIT_URL", "HERMES_BASE_URL", "OPENCLAW_BASE_URL", "OLLAMA_BASE_URL",
-        "BROWSER_USE_BASE_URL", "FIRECRAWL_BASE_URL", "OBSIDIAN_BASE_URL", "N8N_BASE_URL"
+        "BROWSER_USE_BASE_URL", "FIRECRAWL_BASE_URL", "OBSIDIAN_BASE_URL", "N8N_BASE_URL",
+        "OLLAMA_MODEL", "GLOBAL_LOCAL_LLM_PROVIDER"
     ]
     secret_keys = [
         "GEMINI_API_KEY", "OPENAI_API_KEY", "LIVEKIT_API_KEY", "LIVEKIT_API_SECRET",
@@ -1322,6 +1324,59 @@ async def system_env_update(req: EnvUpdateRequest):
             
     env_file.write_text("\n".join(new_lines) + "\n")
     return safe_response({"updated": True, "token_exposed": False})
+
+@app.get("/tokyo/system/health/integrations")
+async def system_health_integrations():
+    env_file = BASE_DIR / ".env"
+    current = {}
+    if env_file.exists():
+        for line in env_file.read_text().splitlines():
+            line = line.strip()
+            if "=" in line and not line.startswith("#"):
+                k, v = line.split("=", 1)
+                current[k.strip()] = v.strip().strip("'").strip('"')
+    
+    status_map = {}
+    
+    # Helthcheck URL configurations
+    # We use a short timeout because if it's down, we don't want the UI to hang.
+    async def check_url(url: str, is_ollama: bool = False) -> str:
+        if not url: return "pending"
+        # Cleanup trailing slashes
+        url = url.rstrip('/')
+        try:
+            test_url = f"{url}/api/version" if is_ollama else url
+            async with httpx.AsyncClient(timeout=3.0) as client:
+                res = await client.get(test_url)
+                if res.status_code < 500: # 404 is fine for base URLs if no auth, 401 is also fine, it means it's alive!
+                    return "connected"
+                return "error"
+        except Exception as e:
+            return "error"
+
+    # API Keys are just marked as configured for now unless we implement specific pings for each cloud provider
+    def check_key(key: str) -> str:
+        if current.get(key): return "connected"
+        return "pending"
+
+    # Nuvem / Cloud
+    status_map["GEMINI_API_KEY"] = check_key("GEMINI_API_KEY")
+    status_map["OPENAI_API_KEY"] = check_key("OPENAI_API_KEY")
+    status_map["LIVEKIT_URL"] = check_key("LIVEKIT_URL") # Just check if exists, livekit needs secret to ping
+    
+    # Ferramentas Locais (Active Pings)
+    status_map["OLLAMA_BASE_URL"] = await check_url(current.get("OLLAMA_BASE_URL"), is_ollama=True)
+    status_map["HERMES_BASE_URL"] = await check_url(current.get("HERMES_BASE_URL"))
+    status_map["N8N_BASE_URL"] = await check_url(current.get("N8N_BASE_URL"))
+    status_map["BROWSER_USE_BASE_URL"] = await check_url(current.get("BROWSER_USE_BASE_URL"))
+    status_map["OPENCLAW_BASE_URL"] = await check_url(current.get("OPENCLAW_BASE_URL"))
+    
+    # External APIs
+    status_map["MEM0_API_KEY"] = check_key("MEM0_API_KEY")
+    status_map["FIRECRAWL_BASE_URL"] = check_key("FIRECRAWL_BASE_URL")
+    status_map["TELEGRAM_BOT_TOKEN"] = check_key("TELEGRAM_BOT_TOKEN")
+    
+    return safe_response({"statuses": status_map})
 
 
 # ═══════════════════════════════════════════════════════════
