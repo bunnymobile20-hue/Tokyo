@@ -1,0 +1,14 @@
+{
+    "enabled": false,
+    "required": false,
+    "safe_mode": true,
+    "base_url": "http://127.0.0.1:9119",
+    "auth_mode": "tokyo_api_key",
+    "llm_provider": "ollama",
+    "ollama_base_url": "http://127.0.0.1:11434",
+    "default_model": "qwen2.5:32b",
+    "automation_mode": "dry_run",
+    "write_actions_enabled": false,
+    "destructive_actions_enabled": false,
+    "requires_human_confirmation": true
+}

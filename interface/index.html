@@ -199,6 +199,7 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
   <button class="sidebar-item" data-page="page-tools"><span class="ico">🧰</span><span>Tools</span></button>
   <div class="sidebar-sep"></div>
   <button class="sidebar-item" data-page="page-intel"><span class="ico">🧠</span><span>Inteligencia</span></button>
+  <button class="sidebar-item" data-page="page-operator"><span class="ico">🤖</span><span>Tokyo Operator</span></button>
   <button class="sidebar-item" data-page="page-system"><span class="ico">⚙️</span><span>Sistema</span></button>
   <button class="sidebar-item" data-page="page-api-keys"><span class="ico">🔑</span><span>API Keys</span></button>
   <button class="sidebar-item" data-page="page-zimaos"><span class="ico">🐳</span><span>ZimaOS</span></button>
@@ -696,6 +697,176 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
   </div>
 </div>
 
+<!-- TOKYO OPERATOR -->
+<div class="page" id="page-operator">
+  <div class="section-title"><span class="ico">🚀</span> Tokyo Operator Console</div>
+  
+  <div class="card wide" style="background: rgba(34, 197, 94, 0.1); border-left: 4px solid #22c55e; margin-bottom: 20px;">
+    <strong>Modo Operador Ativo.</strong> A TokyoOS agora atua como funcionária digital (company_operator) executando pesquisa web, leitura de URLs, criação de documentos e uso do Qwen2.5. Automações reais habilitadas.
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card wide accent-green">
+      <h3><span class="ico">⚙️</span> Operator Status</h3>
+      <div id="operator-status-container">
+        <!-- populated via js -->
+        <div class="row"><span>Carregando...</span></div>
+      </div>
+      <button class="voice-btn voice-btn-preview" style="margin-top:10px;font-size:11px;" onclick="loadOperatorStatus()">Atualizar Status</button>
+    </div>
+    
+    <div class="card accent-purple">
+      <h3><span class="ico">⚡</span> Comandos Rápidos</h3>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px;">
+        <button class="voice-btn voice-btn-start" onclick="executeOperatorCommand('Abra https://example.com e me diga o título.')">Abrir example.com</button>
+        <button class="voice-btn voice-btn-start" onclick="executeOperatorCommand('Abra https://www.youtube.com e me diga se carregou.')">Abrir YouTube</button>
+        <button class="voice-btn voice-btn-start" onclick="executeOperatorCommand('Pesquise na internet sobre ZimaOS e faça um resumo objetivo.')">Pesquisar ZimaOS</button>
+        <button class="voice-btn voice-btn-start" onclick="executeOperatorCommand('Crie um documento chamado relatorio_teste_tokyo.md dizendo que a Tokyo executou uma automação real.')">Criar documento</button>
+        <button class="voice-btn voice-btn-start" onclick="executeOperatorCommand('Crie uma planilha chamada teste_tokyo.csv com colunas setor,tarefa,status.')">Criar planilha CSV</button>
+        <button class="voice-btn voice-btn-start" onclick="executeOperatorCommand('Use o Qwen local para responder TOKYO_OPERADOR_OK.')">Testar Qwen</button>
+        <button class="voice-btn voice-btn-ptt" onclick="executeOperatorCommand('rm -rf /DATA/AppData/tokyoos_src')">Testar bloqueio rm-rf</button>
+        <div style="display:flex;gap:5px;margin-top:5px;">
+          <button class="voice-btn voice-btn-preview" style="flex:1" onclick="loadOperatorJobs()">Atualizar Jobs</button>
+          <button class="voice-btn voice-btn-preview" style="flex:1" onclick="loadOperatorWorkspace()">Atualizar Workspace</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <!-- Command Console -->
+    <div class="card wide">
+      <h3><span class="ico">💻</span> Console de Execução</h3>
+      <div style="display:flex;gap:10px;margin-bottom:10px;">
+        <input type="text" id="operator-cmd-input" placeholder="Digite uma tarefa para a Tokyo executar" style="flex:1;padding:10px;border-radius:6px;border:1px solid #333;background:#1a1a2e;color:#fff;" onkeydown="if(event.key === 'Enter') executeCustomOperatorCommand()">
+        <button id="operator-cmd-btn" class="voice-btn voice-btn-start" onclick="executeCustomOperatorCommand()">Executar tarefa</button>
+      </div>
+      <div id="operator-loading" style="display:none; color: #22c55e; margin-bottom:10px; font-weight:bold;">
+        <span class="ico">🔄</span> Tokyo executando...
+      </div>
+    </div>
+
+    <!-- Visual Result Card -->
+    <div class="card wide" id="operator-result-card" style="display:none; background:#111; border:1px solid #333;">
+      <h3><span class="ico">📊</span> Resultado Visual</h3>
+      <div id="operator-result-badges" style="margin-bottom: 10px;"></div>
+      <div id="operator-result-text" style="font-size:13px; color:#ddd; margin-bottom:10px;"></div>
+      <details style="margin-top: 10px; background: #000; padding: 10px; border-radius: 6px;">
+        <summary style="cursor:pointer; color:#7c3aed; font-size:12px; font-weight:bold;">Ver JSON técnico</summary>
+        <pre id="operator-result-json" style="margin-top:10px; font-size:11px; color:#a3a3a3; white-space:pre-wrap; overflow-x:auto;"></pre>
+      </details>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <!-- Jobs Panel -->
+    <div class="card wide">
+      <h3><span class="ico">📋</span> Jobs Panel (<span id="jobs-count">0</span>)</h3>
+      <div style="max-height: 300px; overflow-y: auto;">
+        <table style="width:100%; border-collapse: collapse; font-size: 11px;">
+          <thead>
+            <tr style="text-align: left; border-bottom: 1px solid #333;">
+              <th style="padding: 5px;">ID / Tempo</th>
+              <th style="padding: 5px;">Status</th>
+              <th style="padding: 5px;">Provider</th>
+              <th style="padding: 5px;">Resumo</th>
+            </tr>
+          </thead>
+          <tbody id="operator-jobs-tbody">
+            <tr><td colspan="4" style="padding:10px; text-align:center;">Nenhum job encontrado</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Workspace Panel -->
+    <div class="card wide">
+      <h3><span class="ico">📁</span> Workspace Panel</h3>
+      <div style="max-height: 300px; overflow-y: auto;">
+        <table style="width:100%; border-collapse: collapse; font-size: 11px;">
+          <thead>
+            <tr style="text-align: left; border-bottom: 1px solid #333;">
+              <th style="padding: 5px;">Arquivo</th>
+              <th style="padding: 5px;">Tamanho</th>
+              <th style="padding: 5px;">Ação</th>
+            </tr>
+          </thead>
+          <tbody id="operator-workspace-tbody">
+            <tr><td colspan="3" style="padding:10px; text-align:center;">Workspace vazio</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div id="workspace-read-modal" style="display:none; margin-top: 15px; padding: 10px; background: #000; border: 1px solid #333; border-radius: 6px;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+          <strong id="workspace-read-title" style="color:#22c55e;"></strong>
+          <button style="background:none; border:none; color:#ff4444; cursor:pointer;" onclick="document.getElementById('workspace-read-modal').style.display='none'">X</button>
+        </div>
+        <pre id="workspace-read-content" style="font-size:11px; color:#ddd; white-space:pre-wrap; max-height:200px; overflow-y:auto;"></pre>
+      </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title" style="margin-top: 30px;"><span class="ico">🖥️</span> Mac Mini Bridge</div>
+  
+  <div class="card wide" style="background: rgba(59, 130, 246, 0.1); border-left: 4px solid #3b82f6; margin-bottom: 20px;">
+    <strong>Integração macOS Ativa.</strong> O ZimaOS está conectado ao Mac Mini via SSH e SMB. A TokyoOS pode abrir URLs, acessar arquivos, rodar AppleScripts seguros e interagir com o ambiente desktop.
+  </div>
+
+  <div class="grid grid-2">
+    <!-- Mac Bridge Status Card -->
+    <div class="card wide accent-blue">
+      <h3><span class="ico">🖥️</span> Mac Status</h3>
+      <div id="mac-bridge-status-container">
+        <div class="row"><span>Carregando...</span></div>
+      </div>
+      <button class="voice-btn voice-btn-preview" style="margin-top:10px;font-size:11px;" onclick="loadMacBridgeStatus()">Atualizar Status</button>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="card accent-purple">
+      <h3><span class="ico">⚡</span> Comandos no Mac</h3>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px;">
+        <button class="voice-btn voice-btn-start" onclick="executeMacCommand('Testar SSH', '/tokyo/mac-bridge/test-ssh')">Testar Conexão SSH</button>
+        <button class="voice-btn voice-btn-start" onclick="executeMacCommand('Abrir Safari', '/tokyo/mac-bridge/open-url', {url: 'https://example.com'})">Abrir Safari (example.com)</button>
+        <button class="voice-btn voice-btn-start" onclick="executeMacCommand('Abrir YouTube', '/tokyo/mac-bridge/open-url', {url: 'https://www.youtube.com', browser: 'chrome'})">Abrir YouTube (Chrome)</button>
+        <button class="voice-btn voice-btn-start" onclick="executeMacCommand('Mostrar Notificação', '/tokyo/mac-bridge/show-notification', {text: 'A TokyoOS assumiu o controle!'})">Mostrar Notificação</button>
+        <button class="voice-btn voice-btn-preview" onclick="executeMacCommand('Abrir Pasta', '/tokyo/mac-bridge/reveal-folder', {path: '/Users/grupsbunny/TokyoShared'})">Abrir Pasta no Finder</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card wide">
+      <h3><span class="ico">💬</span> Ação no Mac via Gateway</h3>
+      <div style="display:flex;gap:10px;margin-bottom:10px;">
+        <input type="text" id="mac-cmd-input" placeholder="Digite o que a Tokyo deve fazer no Mac" style="flex:1;padding:10px;border-radius:6px;border:1px solid #333;background:#1a1a2e;color:#fff;" onkeydown="if(event.key === 'Enter') executeMacActionGateway()">
+        <button class="voice-btn voice-btn-start" onclick="executeMacActionGateway()">Enviar</button>
+      </div>
+      <pre id="mac-action-result" style="background:#111;padding:15px;border-radius:6px;min-height:80px;font-size:12px;color:#a3a3a3;white-space:pre-wrap;border-left:3px solid #3b82f6;"></pre>
+    </div>
+    
+    <div class="card wide">
+      <h3><span class="ico">📁</span> SMB Shared Folder</h3>
+      <div style="max-height: 200px; overflow-y: auto; margin-bottom: 10px;">
+        <table style="width:100%; border-collapse: collapse; font-size: 11px;">
+          <thead>
+            <tr style="text-align: left; border-bottom: 1px solid #333;">
+              <th style="padding: 5px;">Arquivo Mac</th>
+              <th style="padding: 5px;">Tamanho</th>
+            </tr>
+          </thead>
+          <tbody id="mac-smb-tbody">
+            <tr><td colspan="2" style="padding:10px; text-align:center;">Carregando SMB...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <button class="voice-btn voice-btn-preview" style="font-size:11px;" onclick="loadMacSMBFiles()">Listar Arquivos Compartilhados</button>
+    </div>
+  </div>
+</div>
+
+
 <!-- SYSTEM -->
 <div class="page" id="page-system">
   <div class="section-title"><span class="ico">⚙️</span> Sistema</div>
@@ -951,6 +1122,7 @@ const routeMap = {
   '/ui/api-hub': 'page-apihub',
   '/ui/mcp': 'page-mcp',
   '/ui/tools': 'page-tools',
+  '/ui/hermes': 'page-hermes',
   '/ui/intel': 'page-intel',
   '/ui/sistema': 'page-system',
   '/ui/api-keys': 'page-api-keys',
@@ -1498,6 +1670,241 @@ async function stopRealSession() {
   document.getElementById('transcript-panel').innerHTML = '<div style="text-align:center;color:var(--text3);padding:20px">Sessao encerrada. Inicie novamente para conversar.</div>';
 }
 
+// TOKYO OPERATOR JS
+async function loadOperatorStatus() {
+  try {
+    const r = await fetch('/tokyo/operator/status');
+    const d = await r.json();
+    let html = '';
+    const keys = ['mode', 'automation_enabled', 'demo_only', 'dry_run_only', 'safe_mode', 'llm_provider', 'model', 'browser_provider', 'workspace_enabled', 'jobs_file', 'token_exposed'];
+    keys.forEach(k => {
+      let val = d[k];
+      let colorClass = 'chip-info';
+      if (val === true || val === 'available' || val === 'company_operator' || val === 'shim_active') colorClass = 'chip-success';
+      if (val === false) colorClass = 'chip-success'; // false for safe_mode/demo_only is good
+      if (k === 'token_exposed' && val === true) colorClass = 'chip-danger';
+      if (k === 'safe_mode' && val === true) colorClass = 'chip-danger';
+      if (k === 'demo_only' && val === true) colorClass = 'chip-danger';
+      
+      html += `<div class="row"><span>${k}</span><span class="chip ${colorClass}">${val}</span></div>`;
+    });
+    document.getElementById('operator-status-container').innerHTML = html;
+  } catch(e) {
+    document.getElementById('operator-status-container').innerHTML = '<div class="row"><span style="color:#ff4444">Erro ao carregar status</span></div>';
+  }
+}
+
+async function loadOperatorJobs() {
+  try {
+    const r = await fetch('/tokyo/operator/jobs');
+    const d = await r.json();
+    const jobs = d.jobs || [];
+    document.getElementById('jobs-count').textContent = jobs.length;
+    let html = '';
+    if(jobs.length === 0) {
+      html = '<tr><td colspan="4" style="padding:10px; text-align:center;">Nenhum job encontrado</td></tr>';
+    } else {
+      jobs.reverse().forEach(j => {
+        let statusColor = j.status === 'completed' ? '#22c55e' : (j.status === 'blocked_project_protection' || j.status === 'blocked' ? '#ef4444' : '#eab308');
+        html += `<tr style="border-bottom: 1px solid #222;">
+          <td style="padding: 5px;">${j.job_id.substring(0,8)}<br><span style="color:#777;font-size:9px">${j.created_at || ''}</span></td>
+          <td style="padding: 5px;"><span style="color:${statusColor}">${j.status}</span></td>
+          <td style="padding: 5px;">${j.provider_used || ''}</td>
+          <td style="padding: 5px;">${j.summary || ''}</td>
+        </tr>`;
+      });
+    }
+    document.getElementById('operator-jobs-tbody').innerHTML = html;
+  } catch(e) {
+    document.getElementById('operator-jobs-tbody').innerHTML = '<tr><td colspan="4" style="padding:10px; text-align:center; color:#ff4444;">Erro ao carregar jobs</td></tr>';
+  }
+}
+
+async function loadOperatorWorkspace() {
+  try {
+    const r = await fetch('/tokyo/operator/workspace');
+    const d = await r.json();
+    const files = d.files || [];
+    let html = '';
+    if(files.length === 0) {
+      html = '<tr><td colspan="3" style="padding:10px; text-align:center;">Workspace vazio</td></tr>';
+    } else {
+      files.forEach(f => {
+        let size = Math.round((f.size_bytes || 0) / 1024) + ' KB';
+        let isReadable = f.name.endsWith('.md') || f.name.endsWith('.csv') || f.name.endsWith('.txt') || f.name.endsWith('.json');
+        let btn = isReadable ? `<button style="background:#22c55e;border:none;color:#fff;border-radius:3px;padding:3px 6px;cursor:pointer;" onclick="readWorkspaceFile('${f.name}')">Abrir</button>` : '';
+        html += `<tr style="border-bottom: 1px solid #222;">
+          <td style="padding: 5px;">${f.name}</td>
+          <td style="padding: 5px;">${size}</td>
+          <td style="padding: 5px;">${btn}</td>
+        </tr>`;
+      });
+    }
+    document.getElementById('operator-workspace-tbody').innerHTML = html;
+  } catch(e) {
+    document.getElementById('operator-workspace-tbody').innerHTML = '<tr><td colspan="3" style="padding:10px; text-align:center; color:#ff4444;">Erro ao carregar workspace</td></tr>';
+  }
+}
+
+async function readWorkspaceFile(filename) {
+  try {
+    const r = await fetch('/tokyo/operator/workspace/read?filename=' + encodeURIComponent(filename));
+    const d = await r.json();
+    if(d.ok) {
+      document.getElementById('workspace-read-title').textContent = d.filename;
+      document.getElementById('workspace-read-content').textContent = d.content;
+      document.getElementById('workspace-read-modal').style.display = 'block';
+    } else {
+      alert('Erro ao ler arquivo: ' + d.error);
+    }
+  } catch(e) {
+    alert('Erro de conexão ao ler arquivo.');
+  }
+}
+
+function executeCustomOperatorCommand() {
+  const cmd = document.getElementById('operator-cmd-input').value;
+  if(cmd.trim()) {
+    executeOperatorCommand(cmd);
+    document.getElementById('operator-cmd-input').value = '';
+  }
+}
+
+async function executeOperatorCommand(cmd) {
+  document.getElementById('operator-loading').style.display = 'block';
+  document.getElementById('operator-result-card').style.display = 'none';
+  try {
+    const r = await fetch('/tokyo/operator/execute', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({command: cmd, mode: 'company_operator'})
+    });
+    const d = await r.json();
+    
+    // Render result
+    document.getElementById('operator-result-card').style.display = 'block';
+    
+    // Badges
+    let badgesHtml = '';
+    if(d.status === 'completed') badgesHtml += `<span class="chip" style="background:#22c55e;color:#fff;">Executado</span> `;
+    else if(d.status === 'partial') badgesHtml += `<span class="chip" style="background:#eab308;color:#000;">Parcial</span> `;
+    else if(d.status === 'blocked_project_protection' || d.status === 'blocked') badgesHtml += `<span class="chip" style="background:#ef4444;color:#fff;">Bloqueado para proteger projeto</span> `;
+    else badgesHtml += `<span class="chip" style="background:#ef4444;color:#fff;">Falhou</span> `;
+    
+    if(d.provider_used) badgesHtml += `<span class="chip" style="background:#3b82f6;color:#fff;">Provider: ${d.provider_used}</span> `;
+    if(d.job_id) badgesHtml += `<span class="chip" style="background:#6366f1;color:#fff;">Job: ${d.job_id.substring(0,8)}</span> `;
+    
+    document.getElementById('operator-result-badges').innerHTML = badgesHtml;
+    
+    // Text summary
+    let textHtml = `<b>Comando:</b> ${cmd}<br><br><b>Resumo:</b> ${d.summary || d.error || 'Nenhum resumo.'}`;
+    if(d.output_files && d.output_files.length > 0) {
+      textHtml += `<br><br><b>Arquivo criado:</b> ${d.output_files[0]}`;
+    }
+    if(d.evidence && d.evidence.url) {
+      textHtml += `<br><br><b>URL lida:</b> <a href="${d.evidence.url}" target="_blank" style="color:#60a5fa">${d.evidence.url}</a><br><b>Título:</b> ${d.evidence.title || 'N/A'}`;
+    }
+    if(d.provider_used === 'ollama_qwen') {
+      textHtml += `<br><br><b>Resposta do modelo:</b> ${d.summary}`;
+    }
+    document.getElementById('operator-result-text').innerHTML = textHtml;
+    
+    // JSON
+    document.getElementById('operator-result-json').textContent = JSON.stringify(d, null, 2);
+    
+  } catch(e) {
+    document.getElementById('operator-result-card').style.display = 'block';
+    document.getElementById('operator-result-badges').innerHTML = `<span class="chip" style="background:#ef4444;color:#fff;">Erro de Conexão HTTP</span>`;
+    document.getElementById('operator-result-text').innerHTML = 'Falha ao contatar a API da TokyoOS.';
+    document.getElementById('operator-result-json').textContent = e.toString();
+  } finally {
+    document.getElementById('operator-loading').style.display = 'none';
+    loadOperatorJobs();
+    loadOperatorWorkspace();
+  }
+}
+
+// Inicializar Operator UI
+if (document.getElementById('page-operator')) {
+  setTimeout(() => {
+    loadOperatorStatus();
+    loadOperatorJobs();
+    loadOperatorWorkspace();
+  }, 1000);
+}
+
+// Mac Bridge UI Logic
+async function loadMacBridgeStatus() {
+  try {
+    const r = await fetch('/tokyo/mac-bridge/status');
+    const d = await r.json();
+    let html = '';
+    for (let k in d) {
+      let val = d[k];
+      let colorClass = 'chip-info';
+      if (val === true || val === 'active') colorClass = 'chip-success';
+      if (val === false || val === 'disabled' || val === 'mac_bridge_not_configured') colorClass = 'chip-danger';
+      html += `<div class="row"><span>${k}</span><span class="chip ${colorClass}">${val}</span></div>`;
+    }
+    document.getElementById('mac-bridge-status-container').innerHTML = html;
+  } catch(e) {
+    document.getElementById('mac-bridge-status-container').innerHTML = '<div class="row"><span style="color:#ff4444">Erro ao carregar status do Mac Bridge</span></div>';
+  }
+}
+
+async function loadMacSMBFiles() {
+  try {
+    const r = await fetch('/tokyo/mac-bridge/shared-files');
+    const d = await r.json();
+    let html = '';
+    if(d.ok && d.files) {
+      if(d.files.length === 0) {
+        html = '<tr><td colspan="2" style="padding:10px; text-align:center;">Nenhum arquivo na pasta compartilhada</td></tr>';
+      } else {
+        d.files.forEach(f => {
+          let size = Math.round((f.size_bytes || 0) / 1024) + ' KB';
+          html += `<tr style="border-bottom: 1px solid #222;"><td style="padding: 5px;">${f.name}</td><td style="padding: 5px;">${size}</td></tr>`;
+        });
+      }
+    } else {
+      html = `<tr><td colspan="2" style="padding:10px; text-align:center; color:#ff4444;">Erro: ${d.error || 'Não configurado'}</td></tr>`;
+    }
+    document.getElementById('mac-smb-tbody').innerHTML = html;
+  } catch(e) {
+    document.getElementById('mac-smb-tbody').innerHTML = '<tr><td colspan="2" style="padding:10px; text-align:center; color:#ff4444;">Erro ao carregar arquivos SMB</td></tr>';
+  }
+}
+
+async function executeMacCommand(btnName, endpoint, payload = null) {
+  const resultPanel = document.getElementById('mac-action-result');
+  resultPanel.innerHTML = `Executando ${btnName}...`;
+  try {
+    const options = { method: 'POST', headers: {'Content-Type':'application/json'} };
+    if (payload) options.body = JSON.stringify(payload);
+    const r = await fetch(endpoint, options);
+    const d = await r.json();
+    resultPanel.textContent = JSON.stringify(d, null, 2);
+  } catch(e) {
+    resultPanel.textContent = 'Erro de conexão: ' + e;
+  }
+}
+
+async function executeMacActionGateway() {
+  const cmd = document.getElementById('mac-cmd-input').value;
+  if(!cmd.trim()) return;
+  const resultPanel = document.getElementById('mac-action-result');
+  resultPanel.innerHTML = `Enviando comando para Action Gateway...`;
+  try {
+    const r = await fetch('/tokyo/action/execute', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({command: cmd, mode: 'company_operator', source: 'ui_chat'})
+    });
+    const d = await r.json();
+    resultPanel.textContent = JSON.stringify(d, null, 2);
+  } catch(e) {
+    resultPanel.textContent = 'Erro de conexão: ' + e;
+  }
+}
+
 // E2E markers
 async function markE2EEvent(event, room) {
   try {
@@ -1565,8 +1972,193 @@ async function revokeKey(id) {
     });
     refreshAPIKeys();
   } catch(e) {}
+
+}
+// Hermes Lab Bridge JS
+async function fetchHermesLabStatus() {
+  try {
+    const r = await fetch('/tokyo/plugins/hermes/lab/status');
+    const d = await r.json();
+    document.getElementById('hermes-status').textContent = d.hermes_executor || 'offline';
+    document.getElementById('hermes-provider').textContent = d.provider || 'none';
+    document.getElementById('hermes-model').textContent = d.model || 'none';
+    document.getElementById('hermes-ollama-status').textContent = d.ollama_connected ? 'connected' : 'offline';
+    document.getElementById('browser-provider').textContent = d.browser_provider || 'missing';
+    document.getElementById('firecrawl-provider').textContent = d.firecrawl_provider || 'missing';
+    
+    // Fetch executor API details
+    const r2 = await fetch('/tokyo/plugins/hermes/executor/status');
+    const d2 = await r2.json();
+    document.getElementById('executor-status').textContent = d2.connected ? 'connected' : 'offline';
+    document.getElementById('executor-mode').textContent = d2.mode || 'unknown';
+    document.getElementById('executor-base-url').textContent = d2.base_url || 'unknown';
+    document.getElementById('executor-auth').textContent = d2.auth_masked || 'missing';
+  } catch(e) {
+    document.getElementById('hermes-status').textContent = 'error';
+    document.getElementById('executor-status').textContent = 'error';
+  }
+}
+
+async function executeOperatorCommand(cmd) {
+  const resultBox = document.getElementById('operator-cmd-result');
+  resultBox.textContent = "Executando comando real...\n" + cmd;
+  try {
+    const r = await fetch('/tokyo/operator/execute', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({command: cmd})
+    });
+    const d = await r.json();
+    resultBox.textContent += "\n\n" + JSON.stringify(d, null, 2);
+  } catch(e) {
+    resultBox.textContent += "\n\nErro: " + e.message;
+  }
+}
+
+async function executeCustomOperatorCommand() {
+  const input = document.getElementById('operator-cmd-input');
+  if(!input.value) return;
+  await executeOperatorCommand(input.value);
+}
+
+async function testExecutorJobs() {
+  try {
+    const r = await fetch('/tokyo/operator/jobs');
+    const d = await r.json();
+    let txt = "Jobs do Operator:\n";
+    for(const j of d.jobs || []) {
+      txt += `- ${j.command.substring(0,30)}... | ${j.status} | ${j.provider_used}\n`;
+    }
+    alert(txt);
+  } catch(e) { alert("Erro ao carregar jobs."); }
+}
+
+async function testBrowserOpen() {
+  try {
+    const r = await fetch('/tokyo/plugins/hermes/browser/open-url', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({url: 'https://example.com'})
+    });
+    const d = await r.json();
+    if(d.ok) alert("Browser lido com sucesso:\n" + d.title);
+    else alert("Browser Erro: " + d.error);
+  } catch(e) { alert("Erro de conexão com browser provider."); }
+}
+
+async function testFirecrawlScrape() {
+  try {
+    const r = await fetch('/tokyo/plugins/hermes/firecrawl/scrape', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({url: 'https://example.com'})
+    });
+    const d = await r.json();
+    if(d.ok) alert("Firecrawl Scrape OK:\n" + d.title);
+    else alert("Firecrawl Erro: " + d.error);
+  } catch(e) { alert("Erro de conexão com Firecrawl."); }
+}
+
+async function testHermesLabOllama() {
+  try {
+    const r = await fetch('/tokyo/plugins/hermes/lab/test-ollama', { method: 'POST' });
+    const d = await r.json();
+    alert("Teste Qwen32: " + d.summary);
+  } catch(e) {
+    alert("Erro ao testar Ollama.");
+  }
+}
+
+async function testHermesLabHermes() {
+  try {
+    const r = await fetch('/tokyo/plugins/hermes/lab/test-hermes', { method: 'POST' });
+    const d = await r.json();
+    alert("Teste Hermes: " + d.summary);
+  } catch(e) {
+    alert("Erro ao testar Hermes.");
+  }
+}
+
+async function testHermesLabAction(cmd) {
+  document.getElementById('hermes-cmd-input').value = cmd;
+  sendHermesCommand('lab_unlocked');
+}
+
+let currentPendingId = null;
+
+async function executeHermesCommand() {
+  sendHermesCommand('lab_unlocked');
+}
+
+async function sendHermesCommand(mode) {
+  const cmd = document.getElementById('hermes-cmd-input').value;
+  if (!cmd) return;
+  const req = {
+    command: cmd,
+    mode: mode,
+    source: "tokyoos"
+  };
+  
+  if (mode === 'dry_run') {
+    req.request_id = crypto.randomUUID();
+  }
+
+  try {
+    const endpoint = mode === 'dry_run' ? '/tokyo/plugins/hermes/dry-run' : '/tokyo/plugins/hermes/lab/execute';
+    const r = await fetch(endpoint, {
+      method: 'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(req)
+    });
+    const d = await r.json();
+    
+    const resEl = document.getElementById('hermes-cmd-result');
+    if(resEl) {
+      resEl.style.display = 'block';
+      resEl.textContent = JSON.stringify(d, null, 2);
+    }
+
+    if (d.status === "pending_confirmation" && d.job_id) {
+      currentPendingId = d.job_id;
+      const ctn = document.getElementById('hermes-pending-container');
+      if(ctn) ctn.style.display = 'block';
+      const txt = document.getElementById('hermes-pending-text');
+      if(txt) txt.textContent = "Command: " + cmd + "\nRisk: " + d.risk;
+    } else {
+      const ctn = document.getElementById('hermes-pending-container');
+      if(ctn) ctn.style.display = 'none';
+      currentPendingId = null;
+    }
+  } catch(e) {
+    alert("Erro ao enviar comando");
+  }
+}
+
+async function confirmHermesAction(confirm) {
+  if (!currentPendingId) return;
+  
+  try {
+    const r = await fetch('/tokyo/plugins/hermes/confirm', {
+      method: 'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        pending_id: currentPendingId,
+        confirm: confirm,
+        human_confirmation: "CONFIRM_HERMES_ACTION"
+      })
+    });
+    const d = await r.json();
+    
+    const resEl = document.getElementById('hermes-cmd-result');
+    if(resEl) {
+      resEl.style.display = 'block';
+      resEl.textContent = JSON.stringify(d, null, 2);
+    }
+    
+    const ctn = document.getElementById('hermes-pending-container');
+    if(ctn) ctn.style.display = 'none';
+    currentPendingId = null;
+  } catch(e) {
+    alert("Erro ao confirmar comando");
+  }
 }
 refreshAPIKeys();
+fetchHermesStatus();
 </script>
 </body>
 </html>

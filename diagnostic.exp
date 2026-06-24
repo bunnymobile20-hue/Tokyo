@@ -1,0 +1,19 @@
+#!/usr/bin/expect -f
+set timeout 60
+spawn ssh -o StrictHostKeyChecking=no GrupsBunny@192.168.1.173
+expect {
+    "assword:" {
+        send "32215820\r"
+    }
+}
+expect -re {[$#] }
+send "echo 32215820 | sudo -S docker ps -a --filter name=tokyoos\r"
+expect -re {[$#] }
+send "echo 32215820 | sudo -S docker logs --tail=50 tokyoos\r"
+expect -re {[$#] }
+send "curl -s -i http://localhost:8788/tokyo/operator/status\r"
+expect -re {[$#] }
+send "curl -i -X POST http://localhost:8788/tokyo/operator/execute -H 'Content-Type: application/json' -d '{\"command\":\"Abra https://example.com e me diga o título.\",\"mode\":\"company_operator\"}'\r"
+expect -re {[$#] }
+send "exit\r"
+expect eof

@@ -17,6 +17,9 @@ echo "====================================================="
 mkdir -p /data/tokyo/logs /data/tokyo/memory/local /data/tokyo/intelligence
 
 # 1. Start the Voice Agent Worker in the background
+echo "[INFO] Attempting to install Playwright browser..."
+python -m playwright install chromium || echo "[WARN] Failed to install Playwright browser. Will fallback to requests+bs4."
+
 echo "[INFO] Starting Tokyo Voice Agent Worker in background..."
 python scripts/run_tokyo_voice_agent.py &
 WORKER_PID=$!

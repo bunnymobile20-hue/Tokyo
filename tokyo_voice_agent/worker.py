@@ -29,7 +29,7 @@ logger = logging.getLogger("tokyo.agent.worker")
 # Load project prompts if available
 try:
     from prompts import AGENT_INSTRUCTION as ORIG_INSTRUCTION, SESSION_INSTRUCTION
-    instruction = ORIG_INSTRUCTION + "\n\n# Modo Seguro\nVoce esta em modo seguro (" + AGENT_MODE + "). Nao executa acoes reais, nao altera dados, nao conecta ERP. Responda em portugues do Brasil, de forma clara e breve."
+    instruction = ORIG_INSTRUCTION + "\n\n# Modo de Operação\nVocê é Tokyo IA, inteligência operacional do GrupsBunny. Seu papel é executar tarefas empresariais. Responda em português do Brasil, de forma clara, natural e breve."
 except ImportError:
     instruction = AGENT_INSTRUCTION
 

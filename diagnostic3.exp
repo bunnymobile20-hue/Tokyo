@@ -1,0 +1,19 @@
+#!/usr/bin/expect -f
+set timeout 60
+spawn ssh -o StrictHostKeyChecking=no GrupsBunny@192.168.1.173
+expect {
+    "assword:" {
+        send "32215820\r"
+    }
+}
+expect -re {[$#] }
+send "echo 32215820 | sudo -S ls -lah /DATA/AppData/tokyoos/workspace || true\r"
+expect -re {[$#] }
+send "echo 32215820 | sudo -S cat /DATA/AppData/tokyoos/workspace/relatorio_teste_tokyo.md || true\r"
+expect -re {[$#] }
+send "echo 32215820 | sudo -S cat /DATA/AppData/tokyoos/workspace/teste_tokyo.csv || true\r"
+expect -re {[$#] }
+send "echo 32215820 | sudo -S ls -lah /DATA/AppData/tokyoos/hermes_jobs/jobs.jsonl || true\r"
+expect -re {[$#] }
+send "exit\r"
+expect eof

@@ -1,0 +1,21 @@
+#!/usr/bin/expect -f
+set timeout 60
+spawn ssh -o StrictHostKeyChecking=no GrupsBunny@192.168.1.173
+expect {
+    "assword:" {
+        send "32215820\r"
+    }
+}
+expect -re {[$#] }
+send "curl -i -X POST http://localhost:8788/tokyo/operator/execute -H 'Content-Type: application/json' -d '{\"command\":\"Crie um documento chamado relatorio_teste_tokyo.md dizendo que a Tokyo executou uma automação real.\",\"mode\":\"company_operator\"}'\r"
+expect -re {[$#] }
+send "curl -i -X POST http://localhost:8788/tokyo/operator/execute -H 'Content-Type: application/json' -d '{\"command\":\"Crie uma planilha chamada teste_tokyo.csv com colunas setor,tarefa,status.\",\"mode\":\"company_operator\"}'\r"
+expect -re {[$#] }
+send "curl -i -X POST http://localhost:8788/tokyo/operator/execute -H 'Content-Type: application/json' -d '{\"command\":\"Use o Qwen local para responder TOKYO_OPERADOR_OK.\",\"mode\":\"company_operator\"}'\r"
+expect -re {[$#] }
+send "curl -i -X POST http://localhost:8788/tokyo/operator/execute -H 'Content-Type: application/json' -d '{\"command\":\"rm -rf /DATA/AppData/tokyoos_src\",\"mode\":\"company_operator\"}'\r"
+expect -re {[$#] }
+send "echo 32215820 | sudo -S ls -lah /data/tokyo/workspace || true\r"
+expect -re {[$#] }
+send "exit\r"
+expect eof
