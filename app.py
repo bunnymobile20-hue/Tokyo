@@ -23,6 +23,7 @@ from finance_engine.audit import log as audit_log
 from siberian_connector import client as siberian_client
 from siberian_connector.routes import router as siberian_router
 from tokyo_plugins.hermes_bridge.routes import router as hermes_router
+from tokyo_agent_core.routes import router as agent_core_router
 
 load_dotenv()
 
@@ -30,6 +31,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("tokyoos")
 
 BASE_DIR = Path(__file__).parent
+os.environ.setdefault("OPENJARVIS_HOME", str(BASE_DIR / "data" / "openjarvis"))
 CONFIG_DIR = BASE_DIR / "config"
 INTERFACE_DIR = BASE_DIR / "interface"
 DOCS_DIR = BASE_DIR / "docs"
@@ -50,6 +52,7 @@ app = FastAPI(
 
 app.include_router(siberian_router)
 app.include_router(hermes_router)
+app.include_router(agent_core_router)
 
 app.add_middleware(
     CORSMiddleware,
@@ -158,8 +161,23 @@ async def setup_checklist():
 
 @app.get("/tokyo/doctor")
 async def doctor():
+    agent_core_active = False
+    rust_available = False
+    try:
+        from openjarvis import Jarvis
+        from openjarvis.core.registry import AgentRegistry
+        from tokyo_agent_core._rust_bridge import RUST_AVAILABLE
+        import openjarvis.agents # triggers registration
+        rust_available = RUST_AVAILABLE
+        # Instantiate to check initialization
+        j = Jarvis()
+        if AgentRegistry.contains("tokyo_cfo"):
+            agent_core_active = True
+    except Exception:
+        pass
+
     return safe_response({
-        "status": "healthy_with_pending_items",
+        "status": "healthy_with_pending_items" if agent_core_active else "warning",
         "checks": {
             "system": {"status": "healthy", "detail": "TokyoOS rodando"},
             "ui": {"status": "healthy", "detail": "Interface disponivel"},
@@ -168,17 +186,20 @@ async def doctor():
             "openai": {"status": "configured" if env_present("OPENAI_API_KEY") else "not_configured", "detail": "OpenAI provider"},
             "memory": {"status": "healthy", "detail": "Local memory enabled"},
             "mem0": {"status": "configured" if env_present("MEM0_API_KEY") else "not_configured", "detail": "Mem0 cloud memory"},
-            "storage": {"status": "healthy", "detail": "Local storage ok"},
+            "storage": {"status": "healthy" if os.access(os.getenv("TOKYO_DATA_DIR", "/data/tokyo") + "/workspace", os.W_OK | os.R_OK) else "warning", "detail": "Workspace storage OK" if os.access(os.getenv("TOKYO_DATA_DIR", "/data/tokyo") + "/workspace", os.W_OK | os.R_OK) else "Workspace permissões falharam"},
             "security": {"status": "secure" if TOKYO_SAFE_MODE else "warning", "detail": "Safe mode " + ("enabled" if TOKYO_SAFE_MODE else "disabled")},
             "docker": {"status": "pending", "detail": "Docker/ZimaOS deployment pending"},
             "siberian": {"status": "not_configured", "detail": "Sistema Siberian not connected"},
             "integrations": {"status": "pending", "detail": "Optional integrations not configured"},
+            "agent_core": {"status": "healthy" if agent_core_active else "error", "detail": "Agent Core (OpenJarvis) carregado com sucesso" if agent_core_active else "Falha ao carregar Agent Core"},
+            "rust_bridge": {"status": "healthy" if rust_available else "warning", "detail": "Suporte a compilacao Rust ativo" if rust_available else "Compilacao Rust indisponivel (usando fallbacks Python local)"}
         },
         "recommendations": [
             "Configurar GEMINI_API_KEY para LLM principal",
             "Configurar LIVEKIT_URL para voz",
             "Sistema Siberian nao requer configuracao nesta fase",
             "Integracoes opcionais (Hermes, MCP, Ollama) nao sao obrigatorias",
+            "Acesse a aba 'Funcionarios IA' na interface para testar os agentes CFO, COO e Estoque"
         ],
     })
 
@@ -2659,41 +2680,25 @@ class ActionExecuteRequest(BaseModel):
 
 @app.post("/tokyo/action/execute")
 async def action_gateway_execute(req: ActionExecuteRequest):
-    # Gateway rules
-    cmd_lower = req.command.lower()
-    
-    # 1. Route to Mac Bridge if intent is detected
-    if "no mac" in cmd_lower or "mac mini" in cmd_lower or "safari" in cmd_lower:
-        from tokyo_mac_bridge.bridge_service import MacBridgeService
-        mac_svc = MacBridgeService()
+    """
+    Novo Action Gateway (Phase 6B) usando Tokyo Orchestrator LLM.
+    """
+    try:
+        command = req.command
         
-        # Simple NLP logic for Mac commands
-        if "abre o youtube" in cmd_lower or "abra o youtube" in cmd_lower:
-            return safe_response(mac_svc.process_command("open_url", {"url": "https://www.youtube.com"}))
-        elif "abra o relatório" in cmd_lower or "mostra esse arquivo" in cmd_lower or "deixa o pdf aberto" in cmd_lower:
-            # Fake/demo file path for testing intent
-            return safe_response(mac_svc.process_command("reveal_folder", {"path": "/Users/grupsbunny/TokyoShared"}))
-        elif "siberian" in cmd_lower:
-            return safe_response(mac_svc.process_command("open_url", {"url": "https://siberian.test"}))
-        else:
-            # Fallback for Mac intent
-            return safe_response(mac_svc.process_command("open_url", {"url": "https://example.com"}))
-            
-    # 2. Fallback to normal operator execution
-    from tokyo_plugins.hermes_bridge.service import HermesService
-    from tokyo_plugins.hermes_bridge.schemas import HermesExecuteRequest
-    svc = HermesService()
-    res = svc.execute_command(HermesExecuteRequest(command=req.command, mode=req.mode))
-    
-    return safe_response({
-        "ok": res.ok,
-        "status": res.status,
-        "provider_used": "action_gateway_fallback",
-        "action_executed": True,
-        "summary": res.summary,
-        "job_id": res.job_id or "gateway_job",
-        "token_exposed": False
-    })
+        # Security: Do not allow raw script injections directly from UI input
+        if "rm -rf" in command or "sudo" in command:
+            return safe_response({"ok": False, "status": "blocked", "error": "Comando destrutivo detectado e bloqueado pela Safety Gate.", "token_exposed": False})
+        
+        # Usa o Orchestrator (Ollama) para interpretar a intenção
+        from tokyo_orchestrator import route_command
+        res = route_command(command)
+        
+        return safe_response(res)
+
+    except Exception as e:
+        logger.error(f"Gateway execution error: {str(e)}")
+        return safe_response({"ok": False, "status": "failed", "error": str(e), "token_exposed": False})
 
 try:
     from tokyo_mac_bridge.routes import router as mac_bridge_router

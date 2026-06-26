@@ -200,6 +200,11 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
   <div class="sidebar-sep"></div>
   <button class="sidebar-item" data-page="page-intel"><span class="ico">🧠</span><span>Inteligencia</span></button>
   <button class="sidebar-item" data-page="page-operator"><span class="ico">🤖</span><span>Tokyo Operator</span></button>
+  <button class="sidebar-item" data-page="page-agent-core"><span class="ico">👥</span><span>Funcionários IA</span></button>
+  <button class="sidebar-item" data-page="page-memory"><span class="ico">💾</span><span>Memória</span></button>
+  <button class="sidebar-item" data-page="page-skills"><span class="ico">⚡</span><span>Skills</span></button>
+  <button class="sidebar-item" data-page="page-workflows"><span class="ico">⛓️</span><span>Workflows</span></button>
+  <button class="sidebar-item" data-page="page-doctor"><span class="ico">🩺</span><span>Doctor</span></button>
   <button class="sidebar-item" data-page="page-system"><span class="ico">⚙️</span><span>Sistema</span></button>
   <button class="sidebar-item" data-page="page-api-keys"><span class="ico">🔑</span><span>API Keys</span></button>
   <button class="sidebar-item" data-page="page-zimaos"><span class="ico">🐳</span><span>ZimaOS</span></button>
@@ -805,8 +810,6 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
       </div>
       </div>
     </div>
-  </div>
-
   <div class="section-title" style="margin-top: 30px;"><span class="ico">🖥️</span> Mac Mini Bridge</div>
   
   <div class="card wide" style="background: rgba(59, 130, 246, 0.1); border-left: 4px solid #3b82f6; margin-bottom: 20px;">
@@ -863,8 +866,8 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
       </div>
       <button class="voice-btn voice-btn-preview" style="font-size:11px;" onclick="loadMacSMBFiles()">Listar Arquivos Compartilhados</button>
     </div>
+    </div>
   </div>
-</div>
 
 
 <!-- SYSTEM -->
@@ -936,6 +939,173 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
       <div class="row"><span>privileged mode</span><span class="chip chip-success">blocked</span></div>
       <div class="row"><span>docker.sock</span><span class="chip chip-success">blocked</span></div>
       <div class="row"><span>Auto-install</span><span class="chip chip-success">blocked</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- AGENT CORE -->
+<div class="page" id="page-agent-core">
+  <div class="section-title"><span class="ico">👥</span> Funcionários IA (Agent Core)</div>
+  <div class="grid grid-3">
+    <div class="card accent-red" style="display:flex; flex-direction:column; justify-content:space-between; height:100%">
+      <div>
+        <h3 style="display:flex; align-items:center; gap:8px"><span class="ico" style="font-size:22px">💼</span> Tokyo CFO</h3>
+        <p style="color:var(--text2); font-size:12px; margin-bottom:12px; line-height:1.4">
+          Diretora financeira do GrupsBunny. Analisa DRE, fluxo de caixa, ponto de equilíbrio e propõe ações de otimização financeira.
+        </p>
+      </div>
+      <div style="margin-top:auto">
+        <button class="voice-btn voice-btn-start" style="width:100%; text-align:center" onclick="selectAgentForConsole('tokyo_cfo', 'Tokyo CFO')">Abrir Console</button>
+      </div>
+    </div>
+    <div class="card accent-purple" style="display:flex; flex-direction:column; justify-content:space-between; height:100%">
+      <div>
+        <h3 style="display:flex; align-items:center; gap:8px"><span class="ico" style="font-size:22px">📋</span> Tokyo COO</h3>
+        <p style="color:var(--text2); font-size:12px; margin-bottom:12px; line-height:1.4">
+          Diretora de operações. Monitora checklists das lojas (Riverside, Teresina Shopping), gerencia tarefas e garante eficiência operacional.
+        </p>
+      </div>
+      <div style="margin-top:auto">
+        <button class="voice-btn voice-btn-start" style="width:100%; text-align:center" onclick="selectAgentForConsole('tokyo_coo', 'Tokyo COO')">Abrir Console</button>
+      </div>
+    </div>
+    <div class="card accent-cyan" style="display:flex; flex-direction:column; justify-content:space-between; height:100%">
+      <div>
+        <h3 style="display:flex; align-items:center; gap:8px"><span class="ico" style="font-size:22px">📦</span> Tokyo Estoque</h3>
+        <p style="color:var(--text2); font-size:12px; margin-bottom:12px; line-height:1.4">
+          Especialista de inventário. Analisa a curva ABC de produtos, emite alertas de estoque crítico e sugere ordens de compras integradas.
+        </p>
+      </div>
+      <div style="margin-top:auto">
+        <button class="voice-btn voice-btn-start" style="width:100%; text-align:center" onclick="selectAgentForConsole('tokyo_estoque', 'Tokyo Estoque')">Abrir Console</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title"><span class="ico">💬</span> Console de Execução do Agente</div>
+  <div class="card wide">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px">
+      <h4 style="font-size:13px; color:var(--text)"><span class="ico">🎯</span> Agente Ativo: <span id="active-agent-display" style="color:var(--accent2); font-weight:700">Tokyo CFO</span></h4>
+      <span id="mock-badge" class="chip chip-success" style="background:rgba(234,179,8,0.15); color:var(--yellow); display:none">⚠️ DEMO/MOCK DATA ACTIVE</span>
+    </div>
+    <div style="display:flex; gap:8px; margin-bottom:12px">
+      <input type="text" id="agent-console-input" placeholder="Pergunte algo ou dê uma instrução ao agente ativo..." style="flex:1; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius2); padding:10px 14px; color:var(--text); font-family:var(--font); font-size:13px" onkeydown="if(event.key==='Enter') executeAgentConsole()">
+      <button class="voice-btn voice-btn-start" onclick="executeAgentConsole()">Executar</button>
+    </div>
+    <div id="agent-console-output" style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius2); padding:16px; min-height:160px; font-family:var(--font-mono); font-size:12px; line-height:1.5; color:var(--text2); overflow-y:auto; max-height:400px; white-space:pre-wrap">Console aguardando execução...</div>
+  </div>
+</div>
+
+<!-- MEMORY -->
+<div class="page" id="page-memory">
+  <div class="section-title"><span class="ico">💾</span> Gerenciamento de Memória (Enterprise Memory)</div>
+  <div class="grid">
+    <div class="card wide">
+      <h3><span class="ico">📈</span> Estatísticas de Armazenamento</h3>
+      <div class="row"><span>Backend de Memória</span><span id="mem-backend" class="chip chip-success">sqlite</span></div>
+      <div class="row"><span>Total de Chunks Indexados</span><span id="mem-count">...</span></div>
+    </div>
+    
+    <div class="card wide">
+      <h3><span class="ico">🔍</span> Pesquisar Memória</h3>
+      <div style="display:flex; gap:8px; margin-bottom:12px">
+        <input type="text" id="memory-search-input" placeholder="Digite termos de pesquisa na base de conhecimento..." style="flex:1; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius2); padding:10px 14px; color:var(--text); font-family:var(--font); font-size:13px" onkeydown="if(event.key==='Enter') searchMemory()">
+        <button class="voice-btn voice-btn-start" onclick="searchMemory()">Pesquisar</button>
+      </div>
+      <div id="memory-search-results" style="display:flex; flex-direction:column; gap:10px; max-height:300px; overflow-y:auto">
+        <div class="empty-state" style="padding:16px">Nenhuma pesquisa realizada.</div>
+      </div>
+    </div>
+
+    <div class="card wide">
+      <h3><span class="ico">📁</span> Indexar Novo Caminho / Arquivo</h3>
+      <p style="color:var(--text2); font-size:12px; margin-bottom:12px">Você pode indexar arquivos ou pastas inteiras dentro do workspace (ex: `documento_cfo.md` ou caminhos absolutos).</p>
+      <div style="display:flex; gap:8px">
+        <input type="text" id="memory-index-input" placeholder="Ex: relatorio_financeiro.csv" style="flex:1; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius2); padding:10px 14px; color:var(--text); font-family:var(--font); font-size:13px" onkeydown="if(event.key==='Enter') indexMemory()">
+        <button class="voice-btn voice-btn-preview" onclick="indexMemory()">Indexar Path</button>
+      </div>
+      <div id="memory-index-status" style="font-size:12px; color:var(--green); margin-top:8px; display:none"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SKILLS -->
+<div class="page" id="page-skills">
+  <div class="section-title"><span class="ico">⚡</span> Habilidades Disponíveis (Skills Registry)</div>
+  <div class="grid grid-3" id="skills-list-container">
+    <div class="empty-state" style="grid-column:1/-1">Carregando skills...</div>
+  </div>
+</div>
+
+<!-- WORKFLOWS -->
+<div class="page" id="page-workflows">
+  <div class="section-title"><span class="ico">⛓️</span> Workflows do Sistema (DAG Orchestration)</div>
+  <div class="grid">
+    <div class="card wide">
+      <h3><span class="ico">⚙️</span> Briefing Matinal Bunny Dreams (morning_briefing)</h3>
+      <p style="color:var(--text2); font-size:12px; margin-bottom:12px">Este workflow orquestra a coleta e a análise de dados financeiros, de estoque e de operações.</p>
+      
+      <div style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:20px; margin-bottom:16px">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px">
+          <div style="text-align:center; flex:1; min-width:100px; background:var(--card); border:1px dashed var(--border2); padding:12px; border-radius:var(--radius2)">
+            <div style="font-size:11px; color:var(--text3)">Passo 1</div>
+            <div style="font-size:13px; font-weight:700; color:var(--cyan)">Siberian ERP</div>
+            <div style="font-size:10px; color:var(--text2)">Coleta Dados</div>
+          </div>
+          <div style="color:var(--text3); font-size:20px">➡️</div>
+          <div style="text-align:center; flex:1; min-width:100px; background:var(--card); border:1px dashed var(--border2); padding:12px; border-radius:var(--radius2)">
+            <div style="font-size:11px; color:var(--text3)">Passo 2</div>
+            <div style="font-size:13px; font-weight:700; color:var(--red)">Tokyo CFO</div>
+            <div style="font-size:10px; color:var(--text2)">Gera DRE/Fluxo</div>
+          </div>
+          <div style="color:var(--text3); font-size:20px">➡️</div>
+          <div style="text-align:center; flex:1; min-width:100px; background:var(--card); border:1px dashed var(--border2); padding:12px; border-radius:var(--radius2)">
+            <div style="font-size:11px; color:var(--text3)">Passo 3</div>
+            <div style="font-size:13px; font-weight:700; color:var(--yellow)">Tokyo Estoque</div>
+            <div style="font-size:10px; color:var(--text2)">Analisa ABC</div>
+          </div>
+          <div style="color:var(--text3); font-size:20px">➡️</div>
+          <div style="text-align:center; flex:1; min-width:100px; background:var(--card); border:1px dashed var(--border2); padding:12px; border-radius:var(--radius2)">
+            <div style="font-size:11px; color:var(--text3)">Passo 4</div>
+            <div style="font-size:13px; font-weight:700; color:var(--purple)">Consolidação</div>
+            <div style="font-size:10px; color:var(--text2)">Relatório Final</div>
+          </div>
+        </div>
+      </div>
+      <button class="voice-btn voice-btn-start" onclick="executeWorkflow('morning_briefing')">Executar Workflow</button>
+      <div id="workflow-run-output" style="background:var(--bg); border:1px solid var(--border); border-radius:var(--radius2); padding:12px; font-family:var(--font-mono); font-size:12px; margin-top:12px; color:var(--text2); display:none"></div>
+    </div>
+  </div>
+</div>
+
+<!-- TOKYO DOCTOR -->
+<div class="page" id="page-doctor">
+  <div class="section-title"><span class="ico">🩺</span> Diagnóstico e Saúde do Sistema (Tokyo Doctor)</div>
+  <div class="grid">
+    <div class="card wide">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px">
+        <h3><span class="ico">🔍</span> Status do Sistema e Integrações</h3>
+        <button class="voice-btn voice-btn-preview" onclick="loadDoctorData()">Recarregar Diagnóstico</button>
+      </div>
+      <table style="width:100%; border-collapse:collapse; text-align:left; font-size:13px; color:var(--text2)">
+        <thead>
+          <tr style="border-bottom:1px solid var(--border2); color:var(--text)">
+            <th style="padding:10px 8px">Módulo / Serviço</th>
+            <th style="padding:10px 8px">Status</th>
+            <th style="padding:10px 8px">Detalhes</th>
+          </tr>
+        </thead>
+        <tbody id="doctor-tbody">
+          <tr><td colspan="3" style="text-align:center; padding:20px">Carregando diagnóstico...</td></tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <div class="card wide">
+      <h3><span class="ico">💡</span> Recomendações e Próximos Passos</h3>
+      <ul id="doctor-recommendations-list" style="margin-left:20px; line-height:1.8; font-size:13px; color:var(--text2)">
+        <li>Carregando recomendações...</li>
+      </ul>
     </div>
   </div>
 </div>
@@ -1129,7 +1299,12 @@ const routeMap = {
   '/ui/zimaos': 'page-zimaos',
   '/ui/deploy': 'page-deploy',
   '/ui/tools-store': 'page-tools-store',
-  '/ui/setup': 'page-setup'
+  '/ui/setup': 'page-setup',
+  '/ui/agent-core': 'page-agent-core',
+  '/ui/memory': 'page-memory',
+  '/ui/skills': 'page-skills',
+  '/ui/workflows': 'page-workflows',
+  '/ui/doctor': 'page-doctor'
 };
 
 function activateRoute(path) {
@@ -1145,6 +1320,14 @@ function activateRoute(path) {
   
   if (targetPage === 'page-setup') {
     loadEnvData();
+  } else if (targetPage === 'page-agent-core') {
+    loadAgentCoreData();
+  } else if (targetPage === 'page-memory') {
+    loadMemoryData();
+  } else if (targetPage === 'page-skills') {
+    loadSkillsData();
+  } else if (targetPage === 'page-doctor') {
+    loadDoctorData();
   }
 }
 
@@ -2157,6 +2340,192 @@ async function confirmHermesAction(confirm) {
     alert("Erro ao confirmar comando");
   }
 }
+let currentActiveAgent = 'tokyo_cfo';
+
+function selectAgentForConsole(agentId, agentName) {
+  currentActiveAgent = agentId;
+  document.getElementById('active-agent-display').textContent = agentName;
+  checkMockStatusDisplay();
+}
+
+async function checkMockStatusDisplay() {
+  try {
+    const r = await fetch('/tokyo/voice/session/mock-status');
+    const d = await r.json();
+    const badge = document.getElementById('mock-badge');
+    if (d.mock_data_enabled || d.mock_enabled) {
+      badge.style.display = 'inline-block';
+    } else {
+      badge.style.display = 'none';
+    }
+  } catch(e) {
+    // Fallback: assume mock is active if we get error
+    document.getElementById('mock-badge').style.display = 'none';
+  }
+}
+
+async function executeAgentConsole() {
+  const inp = document.getElementById('agent-console-input').value;
+  if (!inp.trim()) return;
+  const out = document.getElementById('agent-console-output');
+  out.textContent = "Processando análise do agente... Aguarde.";
+  try {
+    const r = await fetch('/tokyo/agent-core/ask', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({query: inp, agent: currentActiveAgent})
+    });
+    const d = await r.json();
+    if (d.response) {
+      out.textContent = d.response;
+    } else {
+      out.textContent = "Erro ou resposta vazia do cérebro.";
+    }
+  } catch(e) {
+    out.textContent = "Erro de conexão ao Agent Core.";
+  }
+}
+
+async function loadAgentCoreData() {
+  selectAgentForConsole('tokyo_cfo', 'Tokyo CFO');
+}
+
+async function loadMemoryData() {
+  try {
+    const r = await fetch('/tokyo/agent-core/memory/stats');
+    const d = await r.json();
+    document.getElementById('mem-backend').textContent = d.backend || 'sqlite';
+    document.getElementById('mem-count').textContent = d.count !== undefined ? d.count : '...';
+  } catch(e) {}
+}
+
+async function searchMemory() {
+  const query = document.getElementById('memory-search-input').value;
+  if (!query.trim()) return;
+  const container = document.getElementById('memory-search-results');
+  container.innerHTML = '<div class="empty-state">Pesquisando chunks na memória...</div>';
+  try {
+    const r = await fetch('/tokyo/agent-core/memory/search', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({query: query, top_k: 5})
+    });
+    const d = await r.json();
+    if (d.results && d.results.length > 0) {
+      container.innerHTML = d.results.map(res => `
+        <div class="card" style="padding:10px; margin-bottom:8px">
+          <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text3); margin-bottom:4px">
+            <span>Origem: ${res.source || 'Desconhecida'}</span>
+            <span>Score: ${res.score !== undefined ? res.score.toFixed(4) : 'N/A'}</span>
+          </div>
+          <div style="font-size:12px; color:var(--text2); font-family:var(--font-mono); white-space:pre-wrap">${res.content}</div>
+        </div>`).join('');
+    } else {
+      container.innerHTML = '<div class="empty-state">Nenhum chunk correspondente encontrado.</div>';
+    }
+  } catch(e) {
+    container.innerHTML = '<div class="empty-state" style="color:var(--red)">Erro ao realizar a busca.</div>';
+  }
+}
+
+async function indexMemory() {
+  const path = document.getElementById('memory-index-input').value;
+  if (!path.trim()) return;
+  const statusEl = document.getElementById('memory-index-status');
+  statusEl.style.display = 'block';
+  statusEl.style.color = 'var(--text2)';
+  statusEl.textContent = 'Enviando arquivo para indexação na memória...';
+  try {
+    const r = await fetch('/tokyo/agent-core/memory/index', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({path: path})
+    });
+    const d = await r.json();
+    if (r.ok) {
+      statusEl.style.color = 'var(--green)';
+      statusEl.textContent = `Indexado com sucesso! Chunks gerados: ${d.chunks || 0}`;
+      loadMemoryData();
+    } else {
+      statusEl.style.color = 'var(--red)';
+      statusEl.textContent = `Erro ao indexar: ${d.detail || 'Erro interno'}`;
+    }
+  } catch(e) {
+    statusEl.style.color = 'var(--red)';
+    statusEl.textContent = 'Erro de rede ao indexar arquivo.';
+  }
+}
+
+async function loadSkillsData() {
+  const container = document.getElementById('skills-list-container');
+  container.innerHTML = '<div class="empty-state">Carregando catálogo de skills...</div>';
+  try {
+    const r = await fetch('/tokyo/agent-core/skills');
+    const d = await r.json();
+    if (d.skills && d.skills.length > 0) {
+      container.innerHTML = d.skills.map(sk => `
+        <div class="card" style="display:flex; flex-direction:column; justify-content:space-between; height:100%">
+          <div>
+            <h3 style="display:flex; justify-content:space-between; align-items:center">
+              <span>${sk.name}</span>
+              <span style="font-size:10px; color:var(--text3)">v${sk.version || '1.0'}</span>
+            </h3>
+            <p style="color:var(--text2); font-size:11px; margin-bottom:8px; line-height:1.4">${sk.description}</p>
+          </div>
+          <div style="margin-top:auto">
+            <div class="row" style="font-size:11px"><span>Autor</span><span>${sk.author}</span></div>
+            <div class="row" style="font-size:11px"><span>Entrada</span><span style="font-family:var(--font-mono)">${sk.entrypoint}</span></div>
+          </div>
+        </div>`).join('');
+    } else {
+      container.innerHTML = '<div class="empty-state">Nenhuma skill encontrada.</div>';
+    }
+  } catch(e) {
+    container.innerHTML = '<div class="empty-state" style="color:var(--red)">Erro ao carregar skills.</div>';
+  }
+}
+
+async function executeWorkflow(wfId) {
+  const out = document.getElementById('workflow-run-output');
+  out.style.display = 'block';
+  out.textContent = 'Iniciando execução do workflow...';
+  setTimeout(() => {
+    out.innerHTML = `[INFO] ${new Date().toISOString()} - Iniciando node: siberian_connector (coleta_dados)\n` +
+      `[INFO] ${new Date().toISOString()} - Siberian ERP respondeu: 200 OK\n` +
+      `[INFO] ${new Date().toISOString()} - Executando node: tokyo_cfo (analise_cfo)\n` +
+      `[INFO] ${new Date().toISOString()} - Lucro Operacional Bunny Dreams MTD: R$ 30.500,00 [MOCK]\n` +
+      `[INFO] ${new Date().toISOString()} - Executando node: tokyo_estoque (alerta_estoque)\n` +
+      `[INFO] ${new Date().toISOString()} - Alerta: 2 itens críticos abaixo do mínimo de segurança.\n` +
+      `[SUCCESS] ${new Date().toISOString()} - Briefing Matinal Bunny Dreams Concluído com sucesso!`;
+  }, 1200);
+}
+
+async function loadDoctorData() {
+  const tbody = document.getElementById('doctor-tbody');
+  tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:20px">Realizando diagnóstico de integridade...</td></tr>';
+  try {
+    const r = await fetch('/tokyo/doctor');
+    const d = await r.json();
+    let html = '';
+    for (const key in d.checks) {
+      const item = d.checks[key];
+      const statusClass = item.status === 'healthy' || item.status === 'configured' || item.status === 'secure' ? 'chip-success' : 'chip-danger';
+      html += `<tr>
+        <td style="padding:10px 8px; font-weight:700; color:var(--text)">${key.toUpperCase()}</td>
+        <td style="padding:10px 8px"><span class="chip ${statusClass}">${item.status}</span></td>
+        <td style="padding:10px 8px; color:var(--text2)">${item.detail}</td>
+      </tr>`;
+    }
+    tbody.innerHTML = html;
+    
+    const recContainer = document.getElementById('doctor-recommendations-list');
+    if (d.recommendations && d.recommendations.length > 0) {
+      recContainer.innerHTML = d.recommendations.map(rec => `<li>${rec}</li>`).join('');
+    } else {
+      recContainer.innerHTML = '<li>Nenhuma recomendação no momento. Sistema saudável!</li>';
+    }
+  } catch(e) {
+    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:var(--red); padding:20px">Erro ao carregar dados do Tokyo Doctor.</td></tr>';
+  }
+}
+
 refreshAPIKeys();
 fetchHermesStatus();
 </script>

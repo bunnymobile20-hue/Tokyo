@@ -43,12 +43,13 @@ echo ""
 echo "Enviando chave pública para $MAC_USER@$MAC_IP..."
 echo "Aviso: Você será solicitado a digitar a SENHA DO MAC agora. Esta é a ÚNICA vez."
 
-# 3. Exportar chave usando ssh-copy-id e forçando o uso de um arquivo de identidade customizado
-ssh-copy-id -i "${KEY_FILE}.pub" -o StrictHostKeyChecking=no "$MAC_USER@$MAC_IP"
+# 3. Exportar chave manualmente via SSH (Evita erro de read-only do ssh-copy-id no ZimaOS)
+PUB_KEY=$(cat "${KEY_FILE}.pub")
+ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$MAC_USER@$MAC_IP" "mkdir -p ~/.ssh && chmod 700 ~/.ssh && echo '$PUB_KEY' >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys"
 
 echo ""
 echo "Testando conexão..."
-ssh -i "$KEY_FILE" -o StrictHostKeyChecking=no "$MAC_USER@$MAC_IP" "echo 'MAC_BRIDGE_OK'"
+ssh -i "$KEY_FILE" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$MAC_USER@$MAC_IP" "echo 'MAC_BRIDGE_OK'"
 
 echo "========================================="
 echo " SUCESSO!"
