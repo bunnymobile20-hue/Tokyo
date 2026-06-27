@@ -1,0 +1,14 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn ssh GrupsBunny@192.168.1.173
+expect "password:"
+send "32215820\r"
+expect "GrupsBunny@ZimaOS"
+send "cat << 'YML' > /DATA/AppData/openjarvis-app/docker-compose.yml\nservices:\n  openjarvis:\n    build:\n      context: /DATA/AppData/.openjarvis/src\n      dockerfile: deploy/docker/Dockerfile\n    ports:\n      - \"8789:8000\"\n    environment:\n      - OPENJARVIS_ENGINE_DEFAULT=ollama\n      - OLLAMA_HOST=http://192.168.1.173:11434\n      - OPENJARVIS_API_KEY=tokyokey123\n    restart: unless-stopped\nYML\r"
+expect "GrupsBunny@ZimaOS"
+send "cd /DATA/AppData/openjarvis-app && sudo env DOCKER_CONFIG=/DATA/AppData/.docker-user /DATA/AppData/.docker-user/cli-plugins/docker-compose up -d --force-recreate\r"
+expect "Password:"
+send "32215820\r"
+expect "GrupsBunny@ZimaOS"
+send "exit\r"
+expect eof

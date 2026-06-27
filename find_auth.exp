@@ -1,0 +1,10 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn ssh GrupsBunny@192.168.1.173
+expect "password:"
+send "32215820\r"
+expect "GrupsBunny@ZimaOS"
+send "find /DATA/AppData/.openjarvis/src -name 'auth_middleware.py'\r"
+expect "GrupsBunny@ZimaOS"
+send "exit\r"
+expect eof

@@ -1,0 +1,14 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn ssh GrupsBunny@192.168.1.173
+expect "password:"
+send "32215820\r"
+expect "GrupsBunny@ZimaOS"
+send "cd ~/AppData/tokyoos_src/Tokyo-main\r"
+expect "Tokyo-main"
+send "sudo env DOCKER_CONFIG=/DATA/AppData/.docker-user /DATA/AppData/.docker-user/cli-plugins/docker-compose ps\r"
+expect "Password:"
+send "32215820\r"
+expect "GrupsBunny@ZimaOS"
+send "exit\r"
+expect eof

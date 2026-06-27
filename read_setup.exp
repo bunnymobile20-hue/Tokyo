@@ -1,0 +1,10 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn ssh GrupsBunny@192.168.1.173
+expect "password:"
+send "32215820\r"
+expect "GrupsBunny@ZimaOS"
+send "cat /DATA/AppData/.openjarvis/src/frontend/src/components/SetupScreen.tsx | head -n 40\r"
+expect "GrupsBunny@ZimaOS"
+send "exit\r"
+expect eof

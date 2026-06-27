@@ -1,0 +1,21 @@
+#!/usr/bin/expect -f
+set timeout 300
+spawn ssh GrupsBunny@192.168.1.173
+expect "password:"
+send "32215820\r"
+expect "GrupsBunny@ZimaOS"
+
+# Fix 1: patch detectContext so any private IP is treated as 'selfhosted'
+send "sed -i \"s|if (host === 'localhost' || host === '127.0.0.1' || host === '0.0.0.0') {|if (host === 'localhost' || host === '127.0.0.1' || host === '0.0.0.0' || /^192\\\\.168\\\\./.test(host) || /^10\\\\./.test(host) || /^172\\\\./.test(host)) {|g\" /DATA/AppData/.openjarvis/src/frontend/src/pages/GetStartedPage.tsx\r"
+expect "GrupsBunny@ZimaOS"
+
+# Fix 2: also patch SettingsPage which fetches localhost:11434 for Ollama list
+send "sed -i \"s|fetch('http://localhost:11434/api/tags')|fetch('http://192.168.1.173:11434/api/tags')|g\" /DATA/AppData/.openjarvis/src/frontend/src/pages/SettingsPage.tsx\r"
+expect "GrupsBunny@ZimaOS"
+
+# Verify patches applied
+send "grep -n 'selfhosted\\|192.168' /DATA/AppData/.openjarvis/src/frontend/src/pages/GetStartedPage.tsx | head -5\r"
+expect "GrupsBunny@ZimaOS"
+
+send "exit\r"
+expect eof

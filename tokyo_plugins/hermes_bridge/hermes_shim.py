@@ -76,19 +76,13 @@ def shim_execute(command, mode, token):
             ok = False
             status = "failed"
             summary = res.get("error", "Erro na pesquisa web")
-    elif "hermes_executor_ok" in cmd_lower:
-        # Test case
-        summary = "HERMES_EXECUTOR_OK"
     elif "arquivo" in cmd_lower or "file" in cmd_lower or "create" in cmd_lower:
-        # File creation fallback for testing
         workspace_dir = os.environ.get("TOKYO_DATA_DIR", "/data/tokyo") + "/workspace"
         os.makedirs(workspace_dir, exist_ok=True)
         filename = f"file_{job_id[:8]}.txt"
-        if "hermes_executor_ok.md" in cmd_lower:
-            filename = "hermes_executor_ok.md"
         filepath = os.path.join(workspace_dir, filename)
         with open(filepath, "w") as f:
-            f.write("OK")
+            f.write(f"Conteúdo automático para {command}")
         summary = f"Arquivo criado em {filepath}"
     else:
         # Fallback to local adapter

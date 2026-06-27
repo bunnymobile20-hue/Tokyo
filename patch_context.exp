@@ -1,0 +1,12 @@
+#!/usr/bin/expect -f
+set timeout 300
+spawn ssh GrupsBunny@192.168.1.173
+expect "password:"
+send "32215820\r"
+expect "GrupsBunny@ZimaOS"
+
+# Use python to do the patch (more reliable than sed for complex regex)
+send "python3 -c \"\nimport re\nwith open('/DATA/AppData/.openjarvis/src/frontend/src/pages/GetStartedPage.tsx', 'r') as f:\n    content = f.read()\n\nold = '''function detectContext(): DeployContext {\n  if (isTauri()) return 'desktop';\n  const host = window.location.hostname;\n  if (host === 'localhost' || host === '127.0.0.1' || host === '0.0.0.0') {\n    return 'selfhosted';\n  }\n  return 'hosted';\n}'''\n\nnew = '''function detectContext(): DeployContext {\n  if (isTauri()) return 'desktop';\n  const host = window.location.hostname;\n  const isLocal = host === 'localhost' || host === '127.0.0.1' || host === '0.0.0.0' || /^192\\\\.168\\\\./.test(host) || /^10\\\\./.test(host) || /^172\\\\.(1[6-9]|2[0-9]|3[0-1])\\\\./.test(host);\n  if (isLocal) return 'selfhosted';\n  return 'hosted';\n}'''\n\nif old in content:\n    content = content.replace(old, new)\n    with open('/DATA/AppData/.openjarvis/src/frontend/src/pages/GetStartedPage.tsx', 'w') as f:\n        f.write(content)\n    print('PATCH_OK')\nelse:\n    print('PATCH_NOT_FOUND')\n\"\r"
+expect "GrupsBunny@ZimaOS"
+send "exit\r"
+expect eof

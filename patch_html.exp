@@ -1,0 +1,6 @@
+#!/usr/bin/expect -f
+set timeout 60
+spawn bash -c "scp /Users/dalilabarreto/.gemini/antigravity/scratch/Tokyo/patch_index_html.py GrupsBunny@192.168.1.173:/tmp/patch_index_html.py"
+expect "password:"
+send "32215820\r"
+expect eof

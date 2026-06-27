@@ -1,0 +1,16 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn ssh GrupsBunny@192.168.1.173
+expect "password:"
+send "32215820\r"
+expect "GrupsBunny@ZimaOS"
+send "export HOME=/DATA/AppData\r"
+expect "GrupsBunny@ZimaOS"
+send "nohup /DATA/AppData/.openjarvis/.venv/bin/jarvis serve --host 0.0.0.0 --port 11435 > /tmp/jarvis_serve.log 2>&1 &\r"
+expect "GrupsBunny@ZimaOS"
+send "sleep 5\r"
+expect "GrupsBunny@ZimaOS"
+send "curl -s http://127.0.0.1:11435/v1/models\r"
+expect "GrupsBunny@ZimaOS"
+send "exit\r"
+expect eof

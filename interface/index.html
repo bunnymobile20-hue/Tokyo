@@ -180,6 +180,8 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
     <button class="mode-btn" onclick="switchMode('install')">Install Mode</button>
   </div>
   <div class="topbar-right">
+    <span class="chip chip-purple" id="safety-gate-chip">SafetyGate: Ativo</span>
+    <span class="chip chip-purple" id="zero-mock-gate-chip">Zero Mock Gate: Ativo</span>
     <span class="chip chip-success" id="health-chip">Online</span>
     <span class="topbar-dot"></span>
   </div>
@@ -188,6 +190,7 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
 <div class="layout">
 <nav class="sidebar" id="sidebar">
   <button class="sidebar-item active" data-page="page-home"><span class="ico">🏠</span><span>Home</span></button>
+  <button class="sidebar-item" data-page="page-chat-local"><span class="ico">🤖</span><span>Chat Local</span></button>
   <button class="sidebar-item" data-page="page-voice"><span class="ico">🎙️</span><span>Voz</span></button>
   <button class="sidebar-item" data-page="page-comms"><span class="ico">💬</span><span>Comunicacao</span></button>
   <div class="sidebar-sep"></div>
@@ -216,6 +219,10 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
 <main class="main">
 
 <!-- HOME -->
+<div class="page" id="page-chat-local" style="height: 100%;">
+  <iframe src="/chat-local" style="width: 100%; height: calc(100vh - 80px); border: none; border-radius: var(--radius); background: var(--bg2);"></iframe>
+</div>
+
 <div class="page active" id="page-home">
   <div class="section-title"><span class="ico">🏠</span> TokyoOS — GrupsBunny AI Hub</div>
   <div class="grid grid-2">
@@ -271,8 +278,8 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
         <div class="voice-orb-ring2"></div>
         <div class="voice-orb-pulse"></div>
       </div>
-      <div class="voice-orb-label" id="voice-state-label">Aguardando</div>
-      <div class="voice-orb-sub" id="voice-provider-label">LiveKit · Gemini Realtime · Charon</div>
+      <div class="voice-orb-label" id="voice-state-label">Tokyo Voice: Aguardando</div>
+      <div class="voice-orb-sub" id="voice-provider-label">voice_enabled | voice_status: idle | LiveKit · Gemini Realtime</div>
     </div>
   </div>
 
@@ -1285,6 +1292,7 @@ body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backg
 // Router
 const routeMap = {
   '/ui': 'page-home',
+  '/ui/chat-local': 'page-chat-local',
   '/ui/voz': 'page-voice',
   '/ui/comms': 'page-comms',
   '/ui/grupsbunny': 'page-grupsbunny',

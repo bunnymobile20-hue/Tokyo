@@ -1,0 +1,27 @@
+#!/usr/bin/expect -f
+set timeout 600
+spawn ssh GrupsBunny@192.168.1.173
+expect "password:"
+send "32215820\r"
+expect "GrupsBunny@ZimaOS"
+send "export HOME=/DATA/AppData\r"
+expect "GrupsBunny@ZimaOS"
+send "curl -fsSL https://open-jarvis.github.io/OpenJarvis/install.sh | bash\r"
+expect {
+    "password for" {
+        send "32215820\r"
+        exp_continue
+    }
+    "Password:" {
+        send "32215820\r"
+        exp_continue
+    }
+    "Done." {
+        send "exit\r"
+    }
+    timeout {
+        send "\x03"
+        send "exit\r"
+    }
+}
+expect eof

@@ -1,0 +1,16 @@
+#!/usr/bin/expect -f
+set timeout 300
+spawn ssh GrupsBunny@192.168.1.173
+expect "password:"
+send "32215820\r"
+expect "GrupsBunny@ZimaOS"
+
+# Add VITE_API_URL as a build arg and rebuild
+send "cat /DATA/AppData/.openjarvis/src/deploy/docker/Dockerfile | grep -n 'npm run build'\r"
+expect "GrupsBunny@ZimaOS"
+
+# Patch the Dockerfile to inject VITE_API_URL at build time
+send "python3 -c \"\nwith open('/DATA/AppData/.openjarvis/src/deploy/docker/Dockerfile', 'r') as f:\n    content = f.read()\n\nold = 'RUN npm run build'\nnew = 'ARG VITE_API_URL=\\\"\\\"\\nENV VITE_API_URL=\$VITE_API_URL\\nRUN npm run build'\n\nif old in content:\n    content = content.replace(old, new, 1)\n    with open('/DATA/AppData/.openjarvis/src/deploy/docker/Dockerfile', 'w') as f:\n        f.write(content)\n    print('PATCH_OK')\nelse:\n    print('NOT_FOUND')\n\"\r"
+expect "GrupsBunny@ZimaOS"
+send "exit\r"
+expect eof

@@ -14,6 +14,7 @@ from pydantic import BaseModel
 from typing import Optional
 import httpx
 
+
 from finance_engine import (
     calculate_dre, calculate_cash_flow, calculate_break_even,
     calculate_operational_cycle, calculate_financial_cycle, calculate_minimum_cash,
@@ -24,6 +25,9 @@ from siberian_connector import client as siberian_client
 from siberian_connector.routes import router as siberian_router
 from tokyo_plugins.hermes_bridge.routes import router as hermes_router
 from tokyo_agent_core.routes import router as agent_core_router
+from tokyo_openjarvis_bridge.router import router as bridge_router
+from tokyo_openjarvis_bridge.health import router as bridge_health_router
+from tokyo_dashboards.routes import router as dashboards_router
 
 load_dotenv()
 
@@ -50,9 +54,38 @@ app = FastAPI(
     redoc_url="/tokyo/redoc",
 )
 
+class OIRewriteMiddleware:
+    def __init__(self, app):
+        self.app = app
+    async def __call__(self, scope, receive, send):
+        if scope["type"] == "http" and scope["path"].startswith("/oi/"):
+            scope["path"] = "/" + scope["path"][4:]
+            if "raw_path" in scope:
+                scope["raw_path"] = scope["path"].encode("ascii")
+        await self.app(scope, receive, send)
+
+app.add_middleware(OIRewriteMiddleware)
+
 app.include_router(siberian_router)
 app.include_router(hermes_router)
+app.include_router(bridge_router)
+app.include_router(bridge_health_router, prefix="/tokyo/bridge")
 app.include_router(agent_core_router)
+app.include_router(dashboards_router)
+
+from openjarvis.server.desktop_agent_router import router as desktop_agent_router, operator_router
+app.include_router(desktop_agent_router)
+app.include_router(operator_router)
+
+from openjarvis.server.api_routes import include_all_routes
+from openjarvis.server.routes import router as oj_router
+from openjarvis.engine.ollama import OllamaEngine
+
+app.state.engine = OllamaEngine(host="http://192.168.1.173:11434")
+app.state.engine_name = "ollama"
+
+include_all_routes(app)
+app.include_router(oj_router)
 
 app.add_middleware(
     CORSMiddleware,
@@ -79,7 +112,11 @@ def safe_response(data):
         "tokyo_version": "3.2.0-phase3c",
         "status": "SAFE_TO_CONTINUE_PHASE_3C_ZIMAOS_READY",
     }
-    return JSONResponse(content=data)
+    response = JSONResponse(content=data)
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
 
 
 def env_bool(name, default=False):
@@ -97,6 +134,9 @@ def mask_secret(val):
     return val[:4] + "***" if len(val) > 8 else "***"
 
 
+FRONTEND_DIR = BASE_DIR / "src" / "openjarvis" / "server" / "static"
+app.mount("/assets", StaticFiles(directory=FRONTEND_DIR / "assets"), name="assets")
+
 @app.get("/", response_class=HTMLResponse)
 @app.get("/ui", response_class=HTMLResponse)
 @app.get("/ui/", response_class=HTMLResponse)
@@ -105,7 +145,16 @@ async def serve_ui(module: str = None):
     ui_file = INTERFACE_DIR / "index.html"
     if ui_file.exists():
         return HTMLResponse(content=ui_file.read_text(encoding="utf-8"))
-    return HTMLResponse(content="<h1>TokyoOS UI not found</h1>", status_code=404)
+    return HTMLResponse(content="<h1>TokyoOS UI not found. Please build frontend.</h1>", status_code=404)
+
+@app.get("/chat-local", response_class=HTMLResponse)
+@app.get("/chat-local/", response_class=HTMLResponse)
+@app.get("/chat-local/{module:path}", response_class=HTMLResponse)
+async def serve_chat_local(module: str = None):
+    ui_file = FRONTEND_DIR / "index.html"
+    if ui_file.exists():
+        return HTMLResponse(content=ui_file.read_text(encoding="utf-8"))
+    return HTMLResponse(content="<h1>Chat Local not found. Please build frontend.</h1>", status_code=404)
 
 
 @app.get("/tokyo/system/health")
@@ -247,6 +296,42 @@ async def llm_status():
         "voice_preserved": True,
     })
 
+# --- OLLAMA ENDPOINTS ---
+@app.get("/tokyo/plugins/ollama/models")
+async def ollama_models():
+    from tokyo_agent_core.llm_manager import llm_manager
+    models = llm_manager.list_local_models()
+    hardware = llm_manager.detect_hardware()
+    return safe_response({"models": models, "hardware": hardware})
+
+@app.post("/tokyo/plugins/ollama/pull")
+async def ollama_pull(request: Request):
+    try:
+        data = await request.json()
+        model_name = data.get("model")
+        if not model_name:
+            return safe_response({"success": False, "error": "No model name provided"})
+            
+        from tokyo_agent_core.llm_manager import llm_manager
+        success = llm_manager.pull_model(model_name)
+        return safe_response({"success": success})
+    except Exception as e:
+        return safe_response({"success": False, "error": str(e)})
+
+@app.post("/tokyo/plugins/ollama/assign")
+async def ollama_assign(request: Request):
+    try:
+        data = await request.json()
+        agent_id = data.get("agent_id")
+        model_name = data.get("model")
+        if not agent_id or not model_name:
+            return safe_response({"success": False, "error": "Missing agent_id or model"})
+            
+        from tokyo_agent_core.llm_manager import llm_manager
+        llm_manager.set_model_for_agent(agent_id, model_name)
+        return safe_response({"success": True})
+    except Exception as e:
+        return safe_response({"success": False, "error": str(e)})
 
 @app.get("/tokyo/providers/registry")
 async def providers_registry():

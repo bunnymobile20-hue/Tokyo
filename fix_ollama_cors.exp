@@ -1,0 +1,22 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn ssh GrupsBunny@192.168.1.173
+expect "password:"
+send "32215820\r"
+expect "GrupsBunny@ZimaOS"
+send "sudo mkdir -p /etc/systemd/system/ollama.service.d\r"
+expect "Password:"
+send "32215820\r"
+expect "GrupsBunny@ZimaOS"
+send "sudo bash -c 'echo \"[Service]\" > /etc/systemd/system/ollama.service.d/override.conf'\r"
+expect "GrupsBunny@ZimaOS"
+send "sudo bash -c 'echo \"Environment=\\\"OLLAMA_ORIGINS=*\\\"\" >> /etc/systemd/system/ollama.service.d/override.conf'\r"
+expect "GrupsBunny@ZimaOS"
+send "sudo bash -c 'echo \"Environment=\\\"OLLAMA_HOST=0.0.0.0\\\"\" >> /etc/systemd/system/ollama.service.d/override.conf'\r"
+expect "GrupsBunny@ZimaOS"
+send "sudo systemctl daemon-reload\r"
+expect "GrupsBunny@ZimaOS"
+send "sudo systemctl restart ollama\r"
+expect "GrupsBunny@ZimaOS"
+send "exit\r"
+expect eof

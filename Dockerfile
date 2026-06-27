@@ -23,7 +23,7 @@ COPY rust /build/rust
 
 # Compile openjarvis_rust as a python wheel using maturin
 WORKDIR /build/rust
-RUN maturin build --release --strip --out /build/wheels
+RUN maturin build -m crates/openjarvis-python/Cargo.toml --release --strip --out /build/wheels
 
 # Stage 2: Final runtime stage
 FROM python:3.12-slim-bookworm

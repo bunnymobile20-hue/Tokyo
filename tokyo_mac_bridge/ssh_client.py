@@ -17,6 +17,7 @@ def run_ssh_command(command: str) -> dict:
             "-i", cfg.ssh_key_path,
             "-p", str(cfg.ssh_port),
             "-o", "StrictHostKeyChecking=no",
+            "-o", "UserKnownHostsFile=/dev/null",
             "-o", "ConnectTimeout=5",
             "-o", "BatchMode=yes",  # Fail if password is required
             f"{cfg.mac_user}@{cfg.mac_host}",

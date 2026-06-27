@@ -45,6 +45,43 @@ class HermesService:
     def _fallback_adapter_execute(self, req: HermesExecuteRequest) -> HermesCommandResponse:
         cmd_lower = req.command.lower()
         
+        # Agent Core Business Employee Routing
+        if "bunny dreams" in cmd_lower or "bunnydreams" in cmd_lower or "finanç" in cmd_lower or "financ" in cmd_lower or "cfo" in cmd_lower:
+            from openjarvis import Jarvis
+            try:
+                j = Jarvis()
+                response = j.ask(req.command, agent="tokyo_cfo")
+                return HermesCommandResponse(
+                    ok=True, status="completed", summary=response,
+                    actions_executed=[{"action": "cfo_analysis", "agent": "tokyo_cfo"}]
+                )
+            except Exception as e:
+                return HermesCommandResponse(ok=False, status="failed", summary=f"Erro no agente CFO: {e}", risk="low")
+
+        elif "coo" in cmd_lower or "operaç" in cmd_lower or "operac" in cmd_lower or "checklist" in cmd_lower or "loja" in cmd_lower:
+            from openjarvis import Jarvis
+            try:
+                j = Jarvis()
+                response = j.ask(req.command, agent="tokyo_coo")
+                return HermesCommandResponse(
+                    ok=True, status="completed", summary=response,
+                    actions_executed=[{"action": "coo_analysis", "agent": "tokyo_coo"}]
+                )
+            except Exception as e:
+                return HermesCommandResponse(ok=False, status="failed", summary=f"Erro no agente COO: {e}", risk="low")
+
+        elif "estoque" in cmd_lower or "compra" in cmd_lower or "sku" in cmd_lower or "inventar" in cmd_lower:
+            from openjarvis import Jarvis
+            try:
+                j = Jarvis()
+                response = j.ask(req.command, agent="tokyo_estoque")
+                return HermesCommandResponse(
+                    ok=True, status="completed", summary=response,
+                    actions_executed=[{"action": "estoque_analysis", "agent": "tokyo_estoque"}]
+                )
+            except Exception as e:
+                return HermesCommandResponse(ok=False, status="failed", summary=f"Erro no agente Estoque: {e}", risk="low")
+
         # Test Connection
         if "testar conex" in cmd_lower or "test connection" in cmd_lower:
             return HermesCommandResponse(

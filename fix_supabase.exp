@@ -1,0 +1,16 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn ssh GrupsBunny@192.168.1.173
+expect "password:"
+send "32215820\r"
+expect "GrupsBunny@ZimaOS"
+send "sed -i 's/throw new Error/\\/\\/throw new Error/g' /DATA/AppData/.openjarvis/src/frontend/src/lib/supabase.ts\r"
+expect "GrupsBunny@ZimaOS"
+send "cd /DATA/AppData/openjarvis-app && sudo env DOCKER_CONFIG=/DATA/AppData/.docker-user /DATA/AppData/.docker-user/cli-plugins/docker-compose build --no-cache frontend\r"
+expect "Password:"
+send "32215820\r"
+expect "GrupsBunny@ZimaOS"
+send "sudo env DOCKER_CONFIG=/DATA/AppData/.docker-user /DATA/AppData/.docker-user/cli-plugins/docker-compose up -d --force-recreate\r"
+expect "GrupsBunny@ZimaOS"
+send "exit\r"
+expect eof

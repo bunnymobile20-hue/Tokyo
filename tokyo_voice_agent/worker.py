@@ -22,6 +22,17 @@ from livekit.plugins import noise_cancellation, google
 from tokyo_voice_agent.config import AGENT_VOICE, AGENT_MODE
 from tokyo_voice_agent.gemini_realtime import AGENT_INSTRUCTION
 from tokyo_voice_agent.status import update as agent_update, log_event
+from tokyo_voice_agent.tools import (
+    create_folder_on_macbook,
+    open_website_on_macbook,
+    delete_item_on_macbook,
+    open_notepad_on_macbook,
+    write_text_on_macbook,
+    open_calendar_on_macbook,
+    open_reminders_on_macbook,
+    open_document_on_macbook,
+    read_macbook_screen
+)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("tokyo.agent.worker")
@@ -36,12 +47,44 @@ except ImportError:
 
 class TokyoAssistant(Agent):
     def __init__(self, chat_ctx=None):
+        # Fetch local memory if available
+        memory_context = ""
+        try:
+            import sqlite3
+            db_path = os.getenv("TOKYO_DATA_DIR", "/data/tokyo") + "/memory/local/facts.db"
+            if os.path.exists(db_path):
+                conn = sqlite3.connect(db_path)
+                cursor = conn.cursor()
+                cursor.execute("SELECT content FROM facts ORDER BY created_at DESC LIMIT 5")
+                rows = cursor.fetchall()
+                if rows:
+                    memory_context = "\n\n[MEMÓRIA DE LONGO PRAZO]\nVocê lembra dos seguintes fatos sobre o usuário e a empresa:\n"
+                    for row in rows:
+                        memory_context += f"- {row[0]}\n"
+                conn.close()
+        except Exception as e:
+            logger.warning(f"Failed to load memory: {e}")
+
+        final_instruction = instruction + memory_context
+
         super().__init__(
-            instructions=instruction,
+            instructions=final_instruction,
             llm=google.beta.realtime.RealtimeModel(
                 voice=AGENT_VOICE,
                 temperature=0.6,
+                api_key=os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY"),
             ),
+            tools=[
+                create_folder_on_macbook,
+                open_website_on_macbook,
+                delete_item_on_macbook,
+                open_notepad_on_macbook,
+                write_text_on_macbook,
+                open_calendar_on_macbook,
+                open_reminders_on_macbook,
+                open_document_on_macbook,
+                read_macbook_screen
+            ],
             chat_ctx=chat_ctx,
         )
 

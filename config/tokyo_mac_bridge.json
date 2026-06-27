@@ -1,0 +1,18 @@
+{
+"enabled": true,
+"mode": "ssh_applescript",
+"mac_name": "Mac Mini",
+"mac_host": "192.168.1.211",
+"mac_user": "dalilabarreto",
+"ssh_port": 22,
+"ssh_key_path": "/data/tokyo/security/mac_bridge/id_ed25519",
+"default_browser": "Safari",
+"shared_folder_local": "/data/tokyo/mac_shared",
+"shared_folder_remote": "/Users/dalilabarreto/TokyoShared",
+"allow_open_url": true,
+"allow_open_file": true,
+"allow_finder": true,
+"allow_screenshot": false,
+"allow_shell": false,
+"allow_destructive": false
+}

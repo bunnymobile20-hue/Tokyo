@@ -1,0 +1,17 @@
+#!/usr/bin/expect -f
+set timeout 30
+spawn bash -c "scp /Users/dalilabarreto/.gemini/antigravity/scratch/Tokyo/patch_ollama.py GrupsBunny@192.168.1.173:/tmp/patch_ollama.py"
+expect "password:"
+send "32215820\r"
+expect eof
+
+spawn ssh GrupsBunny@192.168.1.173
+expect "password:"
+send "32215820\r"
+expect "GrupsBunny@ZimaOS"
+send "sudo python3 /tmp/patch_ollama.py\r"
+expect "Password:"
+send "32215820\r"
+expect "GrupsBunny@ZimaOS"
+send "exit\r"
+expect eof

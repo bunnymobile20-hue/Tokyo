@@ -9,6 +9,7 @@ import logging
 from typing import Any, Optional
 from openjarvis.agents._stubs import BaseAgent, AgentContext, AgentResult
 from openjarvis.core.registry import AgentRegistry
+from tokyo_agent_core.llm_manager import llm_manager
 
 logger = logging.getLogger("tokyoos.agents")
 
@@ -75,7 +76,8 @@ class TokyoCfoAgent(BaseAgent):
         ]
         
         try:
-            result = self._generate(messages)
+            agent_model = llm_manager.get_model_for_agent(self.agent_id)
+            result = self._generate(messages, model=agent_model)
             content = result.get("content", "")
         except Exception as e:
             logger.warning(f"Cognitive engine offline, using template analysis: {e}")
@@ -134,7 +136,8 @@ class TokyoCooAgent(BaseAgent):
         ]
         
         try:
-            result = self._generate(messages)
+            agent_model = llm_manager.get_model_for_agent(self.agent_id)
+            result = self._generate(messages, model=agent_model)
             content = result.get("content", "")
         except Exception as e:
             logger.warning(f"Cognitive engine offline, using template analysis: {e}")
@@ -202,7 +205,8 @@ class TokyoEstoqueAgent(BaseAgent):
         ]
         
         try:
-            result = self._generate(messages)
+            agent_model = llm_manager.get_model_for_agent(self.agent_id)
+            result = self._generate(messages, model=agent_model)
             content = result.get("content", "")
         except Exception as e:
             logger.warning(f"Cognitive engine offline, using template analysis: {e}")

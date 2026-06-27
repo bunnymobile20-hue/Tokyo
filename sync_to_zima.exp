@@ -1,0 +1,13 @@
+#!/usr/bin/expect -f
+set timeout 60
+spawn rsync -avz --exclude '.git' --exclude '__pycache__' /Users/dalilabarreto/.gemini/antigravity/scratch/Tokyo/ GrupsBunny@192.168.1.173:/DATA/AppData/tokyoos_src/Tokyo-main/
+expect {
+    "yes/no" {
+        send "yes\r"
+        exp_continue
+    }
+    "password:" {
+        send "32215820\r"
+    }
+}
+expect eof
